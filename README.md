@@ -15,3 +15,11 @@ The category type contains messages that are used in communication adhering to a
 ### Other Category
 The other kind of category contains messages that are not directly used as a response to a request. An example therefore would be messages representing a specific datatype supported by the DBMS.
 This category always contains only one file. The filename adheres to the pattern `[category].proto`.
+
+### Doc Generator
+Detailed Documentation of the proto files their messages and enums and much more can automatically be created using the doc generator included in this repo.
+For this to work, the protobuf compiler must be installed. It's current version can be downloaded [here](https://github.com/protocolbuffers/protobuf/releases/).
+
+To run the doc generator, execute the file `generator.py` in the `doc-generator` directory.
+
+This creates a directory called docs containing the generated documentation.
