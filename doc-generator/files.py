@@ -17,6 +17,7 @@ def proto_files(repo_path, branch_name, directory=PROTO_DIRECTORY):
 def generate_file_section(directory, file_names, repo_path, branch_name):
     processed = []
     content = []
+    short_directory = directory.replace("../", "", 1)
     for file in file_names:
         if file in processed:
             continue
@@ -25,8 +26,8 @@ def generate_file_section(directory, file_names, repo_path, branch_name):
             if responses_file in file_names:
                 category = file.replace(REQUESTS_SUFFIX, '')
                 description = get_file_description(directory, file)
-                file_link = utils.generate_link(repo_path, branch_name, file)
-                responses_file_link = utils.generate_link(repo_path, branch_name, responses_file)
+                file_link = utils.generate_link(repo_path, branch_name, short_directory, file)
+                responses_file_link = utils.generate_link(repo_path, branch_name, short_directory, responses_file)
                 content.append(generate_paired_file_entry(category, file, responses_file, description, file_link, responses_file_link))
                 processed.append(file)
                 processed.append(responses_file)
@@ -36,7 +37,7 @@ def generate_file_section(directory, file_names, repo_path, branch_name):
         elif not file.endswith(REQUESTS_SUFFIX) and not file.endswith(RESPONSES_SUFFIX):
             category = file.replace('.proto', '')
             description = get_file_description(directory, file)
-            file_link = utils.generate_link(repo_path, branch_name, file)
+            file_link = utils.generate_link(repo_path, branch_name, short_directory, file)
             content.append(generate_single_file_entry(category, file, description, file_link))
             processed.append(file)
     return ''.join(content)
@@ -76,11 +77,11 @@ def generate_paired_file_entry(category, request_file, response_file, descriptio
         entry += f'{description}\n\n'
 
     if request_link:
-        entry += f'- **Request Proto File**: `[{request_file}]({request_link})`\n'
+        entry += f'- **Request Proto File**: [`{request_file}`]({request_link})\n'
     else:
         entry += f'- **Request Proto File**: `{request_file}`\n'
     if response_link:
-        entry += f'- **Response Proto File**: `[{response_file}]({response_link})`\n\n'
+        entry += f'- **Response Proto File**: [`{response_file}`]({response_link})\n\n'
     else:
         entry += f'- **Response Proto File**: `{response_file}`\n\n'
     return entry
@@ -91,7 +92,7 @@ def generate_single_file_entry(category, file, description, file_link=None):
     if description:
         entry += f'{description}\n\n'
     if file_link:
-        entry += f'- **Proto File**: `[{file}]({file_link})`\n\n'
+        entry += f'- **Proto File**: [`{file}`]({file_link})\n\n'
     else:
         entry += f'- **Proto File**: `{file}`\n\n'
     return entry

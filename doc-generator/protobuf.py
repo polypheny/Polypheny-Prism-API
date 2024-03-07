@@ -4,8 +4,8 @@ import subprocess
 from google.protobuf import descriptor_pb2
 from google.protobuf.descriptor_pb2 import FieldDescriptorProto
 
-import type_names
 import label_names
+import type_names
 import utils
 
 DESCRIPTOR_SET_OUT = 'descriptor_set.bin'
@@ -28,18 +28,21 @@ def compile_file(proto_file, proto_path=PROTO_DIRECTORY, descriptor_set_out=DESC
         return False
 
 
-def get_messages_from_file_descriptor(file_descriptor):
+def get_messages_from_file_descriptor(file_descriptor, repo_path, branch_name):
     content = []
     if not hasattr(file_descriptor, 'source_code_info'):
         print('ERROR: No source code info!')
         return content
-
-    content.append(generate_title(file_descriptor.name))
+    short_directory = PROTO_DIRECTORY.replace("../", "", 1)
+    file_link = utils.generate_link(repo_path, branch_name, file_descriptor.name, short_directory)
+    content.append(generate_title(file_descriptor.name, file_link))
 
     for message_index, message in enumerate(file_descriptor.message_type):
         message_path = [4, message_index]
         message_description = get_description_for_location(file_descriptor.source_code_info, message_path)
-        content.append(generate_subtitle(message.name, message_description))
+        line = get_line_number_for_location(file_descriptor.source_code_info, message_path)
+        file_link = utils.generate_link(repo_path, branch_name, file_descriptor.name, short_directory, line)
+        content.append(generate_subtitle(message.name, message_description, file_link))
         if message.field:
             content.append('\n')
         for field_index, field in enumerate(message.field):
@@ -54,15 +57,18 @@ def get_messages_from_file_descriptor(file_descriptor):
     return content
 
 
-def get_enums_from_file_descriptor(file_descriptor):
+def get_enums_from_file_descriptor(file_descriptor, repo_path, branch_name):
     content = []
     if not hasattr(file_descriptor, 'source_code_info'):
         print('ERROR: No source code info!')
         return content
+    short_directory = PROTO_DIRECTORY.replace("../", "", 1)
     for enum_index, enum in enumerate(file_descriptor.enum_type):
         enum_path = [5, enum_index]
+        line = get_line_number_for_location(file_descriptor.source_code_info, enum_path)
+        file_link = utils.generate_link(repo_path, branch_name, file_descriptor.name, short_directory, line)
         enum_description = get_description_for_location(file_descriptor.source_code_info, enum_path)
-        content.append(generate_subtitle(enum.name, enum_description))
+        content.append(generate_subtitle(enum.name, enum_description, file_link))
         if enum.value:
             content.append('\n')
         for value_index, value in enumerate(enum.value):
@@ -72,8 +78,10 @@ def get_enums_from_file_descriptor(file_descriptor):
     for message_index, message in enumerate(file_descriptor.message_type):
         for enum_index, enum in enumerate(message.enum_type):
             enum_path = [4, message_index, 4, enum_index]
+            line = get_line_number_for_location(file_descriptor.source_code_info, enum_path)
+            file_link = utils.generate_link(repo_path, branch_name, file_descriptor.name, short_directory, line)
             enum_description = get_description_for_location(file_descriptor.source_code_info, enum_path)
-            content.append(generate_subtitle(enum.name, enum_description))
+            content.append(generate_subtitle(enum.name, enum_description, file_link))
             if enum.value:
                 content.append('\n')
             for value_index, value in enumerate(enum.value):
@@ -85,12 +93,20 @@ def get_enums_from_file_descriptor(file_descriptor):
     return content
 
 
+
 def get_description_for_location(source_code_info, path):
     for location in source_code_info.location:
         if list(location.path) == path:
             comments = [location.leading_comments] + list(location.leading_detached_comments)
             return ' '.join(comment.strip() for comment in comments if comment.strip()).strip()
     return ''
+
+
+def get_line_number_for_location(source_code_info, path):
+    for location in source_code_info.location:
+        if list(location.path) == path:
+            return location.span[0]
+    return None
 
 
 def load_descriptor_set(descriptor_set_file=DESCRIPTOR_SET_OUT):
@@ -107,7 +123,7 @@ def remove_descriptor_set(descriptor_set_file=DESCRIPTOR_SET_OUT):
     os.remove(descriptor_set_file)
 
 
-def messages():
+def messages(repo_path, branch_name):
     content = []
     files = utils.get_proto_file_names(PROTO_DIRECTORY)
     for file in files:
@@ -115,12 +131,12 @@ def messages():
         compile_file(file_path)
         descriptor_set = load_descriptor_set()
         for descriptor in descriptor_set.file:
-            content.extend(get_messages_from_file_descriptor(descriptor))
+            content.extend(get_messages_from_file_descriptor(descriptor, repo_path, branch_name))
     remove_descriptor_set()
     return ''.join(content)
 
 
-def enums():
+def enums(repo_path, branch_name):
     content = []
     files = utils.get_proto_file_names(PROTO_DIRECTORY)
     for file in files:
@@ -128,13 +144,16 @@ def enums():
         compile_file(file_path)
         descriptor_set = load_descriptor_set()
         for descriptor in descriptor_set.file:
-            content.extend(get_enums_from_file_descriptor(descriptor))
+            content.extend(get_enums_from_file_descriptor(descriptor, repo_path, branch_name))
     remove_descriptor_set()
     return ''.join(content)
 
 
-def generate_title(name):
-    content = f'\n### {name}\n'
+def generate_title(name, link=None):
+    if link:
+        content = f'\n### [{name}]({link})\n'
+    else:
+        content = f'\n### {name}\n'
     return content
 
 
@@ -150,8 +169,11 @@ def generate_field_entry(type, name, description=None, label=None):
     return content
 
 
-def generate_subtitle(name, description=None):
-    content = f'\n**{name}**\n'
+def generate_subtitle(name, description=None, link=None):
+    if link:
+        content = f'\n**[{name}]({link})**\n'
+    else:
+        content = f'\n**{name}**\n'
     if description:
         content += f'\n{description}\n'
     return content
