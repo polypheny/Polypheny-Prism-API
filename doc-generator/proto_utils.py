@@ -49,6 +49,37 @@ def get_description_for_location(source_code_info, path):
     return ''
 
 
+def get_source_from_span(span, file_path):
+    start_line, start_column, length_in_chars = span
+    length_in_chars -= 2
+    end_position = start_column + length_in_chars
+    current_char_count = 0
+    with open(file_path, 'r') as proto_file:
+        lines = proto_file.readlines()
+
+    segment = ''
+    for i, line in enumerate(lines, start=0):
+        if i < start_line:
+            continue
+        if i == start_line + 1:
+            line = line[start_column:start_column+length_in_chars]
+        if current_char_count + len(line) >= end_position:
+            segment += line[:end_position - current_char_count]
+            break
+        else:
+            segment += line
+            current_char_count += len(line)
+    return segment.strip()
+
+
+def get_field_type(source_code_info, location_path, file_path):
+    location_path.append(4)
+    for location in source_code_info.location:
+        if list(location.path) == location_path:
+            return get_source_from_span(location.span, file_path)
+    return ''
+
+
 def get_line_number_for_location(source_code_info, path):
     for location in source_code_info.location:
         if list(location.path) == path:

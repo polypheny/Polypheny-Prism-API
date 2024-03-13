@@ -2,11 +2,10 @@ import os
 
 from google.protobuf.descriptor_pb2 import FieldDescriptorProto
 
-import label_names as label_names
-import type_names as type_names
-import utils as utils
 import generator as gen
 import proto_utils as putils
+import type_names as type_names
+import utils as utils
 
 
 def get_messages_from_file_descriptor(file_descriptor, repo_path, tree_ish):
@@ -33,7 +32,8 @@ def get_messages_from_file_descriptor(file_descriptor, repo_path, tree_ish):
                 field_type_name = field.type_name.split('.')[-1]
             else:
                 field_type_name = type_names.get_display_name(field.type)
-            label = label_names.get_display_name(field.label)
+            file_path = os.path.join(putils.PROTO_DIRECTORY, file_descriptor.name)
+            label = putils.get_field_type(file_descriptor.source_code_info, field_path, file_path)
             content.append(gen.generate_field_entry(field_type_name, field.name, field_description, label))
     return content
 
