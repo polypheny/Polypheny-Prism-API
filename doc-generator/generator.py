@@ -1,7 +1,10 @@
-import os
 import argparse
-import files
-import protobuf
+import os
+
+import enums as enums
+import files as files
+import messages as messages
+import rpc as rpc
 
 OUTPUT_DIRECTORY = '../doc'
 
@@ -17,6 +20,8 @@ lang: en
 tags: query interface, protobuf,protocol,grpc
 ---
 {files.readme()}
+## Remote Procedure Calls
+{rpc.rpc(repo_path, tree_ish)}
 ## Message Categories
 
 Below the available categories of messages and the explicit names of their .proto files are listed below.
@@ -26,10 +31,10 @@ Below the available categories of messages and the explicit names of their .prot
 This section provides a comprehensive breakdown of protocol messages used in the communication between clients and the server.
 The messages are categorized by the files containing them.
 Starting from connection-related messages and extending to transaction handling and beyond, the documentation delves into the purpose, structure, and usage of each message.
-{protobuf.messages(repo_path, tree_ish)}
+{messages.messages(repo_path, tree_ish)}
 ## Enums
 This section provides an overview of the enums and their values. Enums are categorized by the files containing them.
-{protobuf.enums(repo_path, tree_ish)}
+{enums.enums(repo_path, tree_ish)}
 
 """
     return file, text
@@ -82,6 +87,85 @@ The initial version of the PrismInterface has been developed by [Tobias Hafner](
     return file, text
 
 
+def generate_title(name, link=None):
+    if link:
+        content = f'\n### [{name}]({link})\n'
+    else:
+        content = f'\n### {name}\n'
+    return content
+
+
+def generate_rpc_message(type, name, is_request, link=None):
+    if is_request:
+        entry = '- Request message: '
+    else:
+        entry = '- Response message: '
+    if link:
+        entry += f'`{type}` [{name}]({link})\n'
+    else:
+        entry += f'`{type}`: {name}\n'
+    return entry
+
+
+def generate_field_entry(type, name, description=None, label=None):
+    content = f'- '
+    if label:
+        content += f'`{label}` '
+    content += f'`{type}` **{name}'
+    if description:
+        content += f':** {description}\n'
+    else:
+        content += '**\n'
+    return content
+
+
+def generate_subtitle(name, description=None, link=None):
+    if link:
+        content = f'\n**[{name}]({link})**\n'
+    else:
+        content = f'\n**{name}**\n'
+    if description:
+        content += f'\n{description}\n'
+    return content
+
+
+def generate_value_entry(name, value, description=None):
+    content = f'- `{name}` = {value}'
+    if description:
+        content += f': {description}\n'
+    else:
+        content += '\n'
+    return content
+
+
+def generate_paired_file_entry(category, request_file, response_file, description, request_link=None,
+                               response_link=None):
+    entry = f'### {category}\n'
+    if description:
+        entry += f'{description}\n\n'
+
+    if request_link:
+        entry += f'- **Request Proto File**: [`{request_file}`]({request_link})\n'
+    else:
+        entry += f'- **Request Proto File**: `{request_file}`\n'
+    if response_link:
+        entry += f'- **Response Proto File**: [`{response_file}`]({response_link})\n\n'
+    else:
+        entry += f'- **Response Proto File**: `{response_file}`\n\n'
+    return entry
+
+
+def generate_single_file_entry(category, file, description, file_link=None):
+    entry = f'### {category}\n'
+    if description:
+        entry += f'{description}\n\n'
+    if file_link:
+        entry += f'- **Proto File**: [`{file}`]({file_link})\n\n'
+    else:
+        entry += f'- **Proto File**: `{file}`\n\n'
+    return entry
+
+
 def create_directory(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -92,7 +176,7 @@ def write_to_file(file, text):
         file.write(text)
 
 
-def main(repo_path, tree_ish ):
+def main(repo_path, tree_ish):
     create_directory(OUTPUT_DIRECTORY)
 
     tasks = [
@@ -108,10 +192,10 @@ def main(repo_path, tree_ish ):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Generate documentation links for GitHub files.")
-    parser.add_argument('repo_path', type=str, help='The full path to the GitHub repository, e.g., "https://github.com/polypheny/Polypheny-Prism-API".')
-    parser.add_argument('tree-ish', type=str, help='A tree-ish such as a commit hash or a branch name.')
+    parser.add_argument('repo_path', type=str,
+                        help='The full path to the GitHub repository, e.g., "https://github.com/polypheny/Polypheny-Prism-API".')
+    parser.add_argument('tree_ish', type=str, help='A tree-ish such as a commit hash or a branch name.')
 
     args = parser.parse_args()
 
-    main(args.repo_path, args.branch_name)
-
+    main(args.repo_path, args.tree_ish)
