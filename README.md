@@ -23,3 +23,10 @@ For this to work, the protobuf compiler must be installed. It's current version 
 To run the doc generator, execute the file `generator.py` in the `doc-generator` directory.
 
 This creates a directory called docs containing the generated documentation.
+
+### Generate Python files
+
+Generate the Python code:
+```
+python -m grpc_tools.protoc -I proto --python_out . proto/polyprism/*.proto
+```
