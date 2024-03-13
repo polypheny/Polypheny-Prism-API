@@ -28,8 +28,8 @@ package polypheny.protointerface;
 Wrapper message wrapping a specific request message to be sent to the server.
  */
 message Request {
-  // client id used to identify the client
-  uint64 id = 1; // Always > 0
+  // The id of the request.  Must be strictly greater than 0.
+  uint64 id = 1;
   oneof type {
     DbmsVersionRequest dbms_version_request = 2;
     LanguageRequest language_request = 3;
@@ -80,8 +80,8 @@ message ErrorResponse {
 Wrapper message wrapping a specific response message to be sent to the client.
  */
 message Response {
-  // Client id to identify a client
-  uint64 id = 1; // Always > 0
+  // The id of the request this response is related to.
+  uint64 id = 1;
   // If a request triggers a stream of responses from the server, this flag represents a response to be the end of the stream.
   bool last = 2;
   oneof type {
