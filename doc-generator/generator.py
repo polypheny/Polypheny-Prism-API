@@ -6,7 +6,7 @@ import protobuf
 OUTPUT_DIRECTORY = '../doc'
 
 
-def generate_protocol_doc(repo_path, branch_name):
+def generate_protocol_doc(repo_path, tree_ish):
     file = 'protocol.md'
 
     text = f"""---
@@ -20,16 +20,16 @@ tags: query interface, protobuf,protocol,grpc
 ## Message Categories
 
 Below the available categories of messages and the explicit names of their .proto files are listed below.
-{files.proto_files(repo_path, branch_name)}
+{files.proto_files(repo_path, tree_ish)}
 ## Protocol Messages
 
 This section provides a comprehensive breakdown of protocol messages used in the communication between clients and the server.
 The messages are categorized by the files containing them.
 Starting from connection-related messages and extending to transaction handling and beyond, the documentation delves into the purpose, structure, and usage of each message.
-{protobuf.messages(repo_path, branch_name)}
+{protobuf.messages(repo_path, tree_ish)}
 ## Enums
 This section provides an overview of the enums and their values. Enums are categorized by the files containing them.
-{protobuf.enums(repo_path, branch_name)}
+{protobuf.enums(repo_path, tree_ish)}
 
 """
     return file, text
@@ -92,7 +92,7 @@ def write_to_file(file, text):
         file.write(text)
 
 
-def main(repo_path, branch_name, ):
+def main(repo_path, tree_ish ):
     create_directory(OUTPUT_DIRECTORY)
 
     tasks = [
@@ -101,7 +101,7 @@ def main(repo_path, branch_name, ):
     ]
 
     for task in tasks:
-        file, text = task(repo_path, branch_name)
+        file, text = task(repo_path, tree_ish)
         path = os.path.join(OUTPUT_DIRECTORY, file)
         write_to_file(path, text)
 
@@ -109,7 +109,7 @@ def main(repo_path, branch_name, ):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Generate documentation links for GitHub files.")
     parser.add_argument('repo_path', type=str, help='The full path to the GitHub repository, e.g., "https://github.com/polypheny/Polypheny-Prism-API".')
-    parser.add_argument('branch_name', type=str, help='The name of the branch to document.')
+    parser.add_argument('tree-ish', type=str, help='A tree-ish such as a commit hash or a branch name.')
 
     args = parser.parse_args()
 

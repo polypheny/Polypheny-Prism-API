@@ -14,7 +14,7 @@ def proto_files(repo_path, branch_name, directory=PROTO_DIRECTORY):
     return generate_file_section(directory, file_names, repo_path, branch_name)
 
 
-def generate_file_section(directory, file_names, repo_path, branch_name):
+def generate_file_section(directory, file_names, repo_path, tree_ish):
     processed = []
     content = []
     short_directory = directory.replace("../", "", 1)
@@ -26,8 +26,8 @@ def generate_file_section(directory, file_names, repo_path, branch_name):
             if responses_file in file_names:
                 category = file.replace(REQUESTS_SUFFIX, '')
                 description = get_file_description(directory, file)
-                file_link = utils.generate_link(repo_path, branch_name, short_directory, file)
-                responses_file_link = utils.generate_link(repo_path, branch_name, short_directory, responses_file)
+                file_link = utils.generate_link(repo_path, tree_ish, short_directory, file)
+                responses_file_link = utils.generate_link(repo_path, tree_ish, short_directory, responses_file)
                 content.append(generate_paired_file_entry(category, file, responses_file, description, file_link, responses_file_link))
                 processed.append(file)
                 processed.append(responses_file)
@@ -37,7 +37,7 @@ def generate_file_section(directory, file_names, repo_path, branch_name):
         elif not file.endswith(REQUESTS_SUFFIX) and not file.endswith(RESPONSES_SUFFIX):
             category = file.replace('.proto', '')
             description = get_file_description(directory, file)
-            file_link = utils.generate_link(repo_path, branch_name, short_directory, file)
+            file_link = utils.generate_link(repo_path, tree_ish, short_directory, file)
             content.append(generate_single_file_entry(category, file, description, file_link))
             processed.append(file)
     return ''.join(content)

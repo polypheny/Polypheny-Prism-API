@@ -28,20 +28,20 @@ def compile_file(proto_file, proto_path=PROTO_DIRECTORY, descriptor_set_out=DESC
         return False
 
 
-def get_messages_from_file_descriptor(file_descriptor, repo_path, branch_name):
+def get_messages_from_file_descriptor(file_descriptor, repo_path, tree_ish):
     content = []
     if not hasattr(file_descriptor, 'source_code_info'):
         print('ERROR: No source code info!')
         return content
     short_directory = PROTO_DIRECTORY.replace("../", "", 1)
-    file_link = utils.generate_link(repo_path, branch_name, file_descriptor.name, short_directory)
+    file_link = utils.generate_link(repo_path, tree_ish, file_descriptor.name, short_directory)
     content.append(generate_title(file_descriptor.name, file_link))
 
     for message_index, message in enumerate(file_descriptor.message_type):
         message_path = [4, message_index]
         message_description = get_description_for_location(file_descriptor.source_code_info, message_path)
         line = get_line_number_for_location(file_descriptor.source_code_info, message_path)
-        file_link = utils.generate_link(repo_path, branch_name, file_descriptor.name, short_directory, line)
+        file_link = utils.generate_link(repo_path, tree_ish, file_descriptor.name, short_directory, line)
         content.append(generate_subtitle(message.name, message_description, file_link))
         if message.field:
             content.append('\n')
@@ -57,7 +57,7 @@ def get_messages_from_file_descriptor(file_descriptor, repo_path, branch_name):
     return content
 
 
-def get_enums_from_file_descriptor(file_descriptor, repo_path, branch_name):
+def get_enums_from_file_descriptor(file_descriptor, repo_path, tree_ish):
     content = []
     if not hasattr(file_descriptor, 'source_code_info'):
         print('ERROR: No source code info!')
@@ -66,7 +66,7 @@ def get_enums_from_file_descriptor(file_descriptor, repo_path, branch_name):
     for enum_index, enum in enumerate(file_descriptor.enum_type):
         enum_path = [5, enum_index]
         line = get_line_number_for_location(file_descriptor.source_code_info, enum_path)
-        file_link = utils.generate_link(repo_path, branch_name, file_descriptor.name, short_directory, line)
+        file_link = utils.generate_link(repo_path, tree_ish, file_descriptor.name, short_directory, line)
         enum_description = get_description_for_location(file_descriptor.source_code_info, enum_path)
         content.append(generate_subtitle(enum.name, enum_description, file_link))
         if enum.value:
@@ -79,7 +79,7 @@ def get_enums_from_file_descriptor(file_descriptor, repo_path, branch_name):
         for enum_index, enum in enumerate(message.enum_type):
             enum_path = [4, message_index, 4, enum_index]
             line = get_line_number_for_location(file_descriptor.source_code_info, enum_path)
-            file_link = utils.generate_link(repo_path, branch_name, file_descriptor.name, short_directory, line)
+            file_link = utils.generate_link(repo_path, tree_ish, file_descriptor.name, short_directory, line)
             enum_description = get_description_for_location(file_descriptor.source_code_info, enum_path)
             content.append(generate_subtitle(enum.name, enum_description, file_link))
             if enum.value:
@@ -136,7 +136,7 @@ def messages(repo_path, branch_name):
     return ''.join(content)
 
 
-def enums(repo_path, branch_name):
+def enums(repo_path, tree_ish):
     content = []
     files = utils.get_proto_file_names(PROTO_DIRECTORY)
     for file in files:
@@ -144,7 +144,7 @@ def enums(repo_path, branch_name):
         compile_file(file_path)
         descriptor_set = load_descriptor_set()
         for descriptor in descriptor_set.file:
-            content.extend(get_enums_from_file_descriptor(descriptor, repo_path, branch_name))
+            content.extend(get_enums_from_file_descriptor(descriptor, repo_path, tree_ish))
     remove_descriptor_set()
     return ''.join(content)
 
