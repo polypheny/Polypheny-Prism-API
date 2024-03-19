@@ -164,8 +164,6 @@ message ProtoValue {
     ProtoInterval interval = 13;
     // Field used to represent a user-defined type. If set, all other fields must be empty.
     ProtoUserDefinedType user_defined_type = 14;
-    // Field used to represent a file. If set, all other fields must be empty.
-    ProtoFile file = 15;
     // Field used to represent a list. If set, all other fields must be empty.
     ProtoList list = 16;
     // Field used to represent a map. If set, all other fields must be empty.
