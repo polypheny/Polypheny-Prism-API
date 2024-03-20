@@ -4,15 +4,23 @@ Messages related to statements in a query language and their results.
 
 syntax = "proto3";
 
-import "relational_frame.proto";
-import "graph_frame.proto";
-import "document_frame.proto";
+import "polyprism/relational_frame.proto";
+import "polyprism/graph_frame.proto";
+import "polyprism/document_frame.proto";
 
 option java_multiple_files = true;
 option java_package = "org.polypheny.db.protointerface.proto";
 option java_outer_classname = "StatementResponses";
 
 package polypheny.protointerface;
+
+/*
+Response of the server on the request of a client to close the result set of a specific statement.
+This message has no fields. It merely serves as an acknowledgement.
+ */
+message CloseResultResponse {
+}
+
 
 /*
 Represents the response after executing a statement.
