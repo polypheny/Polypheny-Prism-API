@@ -5,7 +5,7 @@ import utils as utils
 import proto_utils as putils
 import generator as gen
 
-PROTO_DIRECTORY = '../proto'
+PROTO_DIRECTORY = '../proto/polyprism'
 README_PATH = '../README.md'
 REQUESTS_SUFFIX = '_requests.proto'
 RESPONSES_SUFFIX = '_responses.proto'
