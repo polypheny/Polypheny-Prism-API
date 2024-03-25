@@ -199,6 +199,7 @@ message ProtoLong {
 
 /*
 Represents a BigDecimal value with specified precision and scale.
+The value is reconstructed by calculating unscaled_value * 10 ^ -scale.
 */
 message ProtoBigDecimal {
   // The scale of the BigDecimal.
@@ -237,7 +238,7 @@ message ProtoDate {
 Represents a time value.
 */
 message ProtoTime {
-  // The value of the time
+  // Milliseconds since midnight of an arbitrary day.
   int32 time = 1;
 }
 
@@ -250,11 +251,14 @@ message ProtoTimestamp {
 }
 
 /*
-Represents an interval value.
+Represents an interval value. Intervals ar specified either in months or milliseconds. The applicable unit is determined
+by the field set in the message. Only one of the fields is set.
 */
 message ProtoInterval {
   oneof unit {
+    // Contains the duration of the interval in milliseconds if milliseconds where chosen as the unit of time for that interval.
     int64 milliseconds = 1;
+    // Contains the duration of the interval in months if months where chosen as the unit of time for that interval.
     int64 months = 2;
   }
 }
@@ -263,7 +267,7 @@ message ProtoInterval {
 Represents a string value.
 */
 message ProtoString {
-  // A string value.
+  // A string value of arbitrary length.
   string string = 1;
 }
 
@@ -271,12 +275,12 @@ message ProtoString {
 Represents binary data.
 */
 message ProtoBinary {
-  // Binary data.
+  // Binary data of arbitrary length.
   bytes binary = 1;
 }
 
 /*
-Represents a null value. This message doesn’t contain any fields.
+Represents a null value. This message does not contain any fields.
 */
 message ProtoNull {
 }
@@ -290,7 +294,7 @@ message ProtoList {
 }
 
 /*
-Defines a key-value pair using ProtoValue for both key and value.
+Defines a key-value pair using ProtoValues for both key and value.
 */
 message ProtoEntry {
   // The key of the entry.
