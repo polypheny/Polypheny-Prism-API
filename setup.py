@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-setup(name='polyphenyproto',
+setup(name='polyphenyprism',
       version='0.1',
       description='Protobuf files for Polypheny',
       packages=['polyprism'],
