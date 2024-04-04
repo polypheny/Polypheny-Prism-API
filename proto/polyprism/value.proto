@@ -169,6 +169,8 @@ message ProtoValue {
     ProtoList list = 16;
     // Field used to represent a document consisting of key value pairs where keys and values are arbitrary ProtoValues. If set, all other fields must be empty.
     ProtoDocument document = 18;
+    // Field used to represent a FILE type such as FILE, IMAGE, VIDEO or AUDIO.
+    ProtoFile file = 19;
   }
 }
 
@@ -309,4 +311,12 @@ Represents a document consisting of multiple ProtoEntry items.
 message ProtoDocument {
   // The list of ProtoEntry items forming the document.
   repeated ProtoEntry entries = 1;
+}
+
+/*
+Represents a file containing large binary data.
+ */
+message ProtoFile {
+  // The content of the file in binary.
+  bytes binary = 1;
 }
