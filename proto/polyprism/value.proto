@@ -253,16 +253,11 @@ message ProtoTimestamp {
 }
 
 /*
-Represents an interval value. Intervals ar specified either in months or milliseconds. The applicable unit is determined
-by the field set in the message. Only one of the fields is set.
+Represents an interval value.
 */
 message ProtoInterval {
-  oneof unit {
-    // Contains the duration of the interval in milliseconds if milliseconds where chosen as the unit of time for that interval.
-    int64 milliseconds = 1;
-    // Contains the duration of the interval in months if months where chosen as the unit of time for that interval.
-    int64 months = 2;
-  }
+  int64 milliseconds = 1;
+  int64 months = 2;
 }
 
 /*
