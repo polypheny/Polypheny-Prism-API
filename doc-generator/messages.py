@@ -1,7 +1,7 @@
 import os
 
 from google.protobuf.descriptor_pb2 import FieldDescriptorProto
-
+import config
 import generator as gen
 import proto_utils as putils
 import type_names as type_names
@@ -13,7 +13,7 @@ def get_messages_from_file_descriptor(file_descriptor, repo_path, tree_ish):
     if not hasattr(file_descriptor, 'source_code_info'):
         print('ERROR: No source code info!')
         return content
-    short_directory = putils.PROTO_DIRECTORY.replace("../", "", 1)
+    short_directory = config.IMPORT_BASE_DIR.replace("../", "", 1)
     file_link = utils.generate_link(repo_path, tree_ish, file_descriptor.name, short_directory)
     content.append(gen.generate_title(file_descriptor.name, file_link))
 
@@ -32,7 +32,7 @@ def get_messages_from_file_descriptor(file_descriptor, repo_path, tree_ish):
                 field_type_name = field.type_name.split('.')[-1]
             else:
                 field_type_name = type_names.get_display_name(field.type)
-            file_path = os.path.join(putils.PROTO_DIRECTORY, file_descriptor.name)
+            file_path = os.path.join(config.IMPORT_BASE_DIR, file_descriptor.name)
             label = putils.get_field_type(file_descriptor.source_code_info, field_path, file_path)
             content.append(gen.generate_field_entry(field_type_name, field.name, field_description, label))
     return content
@@ -40,9 +40,9 @@ def get_messages_from_file_descriptor(file_descriptor, repo_path, tree_ish):
 
 def messages(repo_path, branch_name):
     content = []
-    files = putils.get_proto_file_names(putils.PROTO_DIRECTORY + "polyprism")
+    files = putils.get_proto_file_names(config.PROTO_DIR)
     for file in files:
-        file_path = os.path.join(putils.PROTO_DIRECTORY + "polyprism", file)
+        file_path = os.path.join(config.PROTO_DIR, file)
         putils.compile_file(file_path)
         descriptor_set = putils.load_descriptor_set()
         for descriptor in descriptor_set.file:

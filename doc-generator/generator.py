@@ -1,12 +1,11 @@
 import argparse
 import os
+import config
 
 import enums as enums
 import files as files
 import messages as messages
 import rpc as rpc
-
-OUTPUT_DIRECTORY = '../doc'
 
 
 def generate_protocol_doc(repo_path, tree_ish):
@@ -177,7 +176,7 @@ def write_to_file(file, text):
 
 
 def main(repo_path, tree_ish):
-    create_directory(OUTPUT_DIRECTORY)
+    create_directory(config.OUTPUT_DIR)
 
     tasks = [
         generate_overview_doc,
@@ -186,7 +185,7 @@ def main(repo_path, tree_ish):
 
     for task in tasks:
         file, text = task(repo_path, tree_ish)
-        path = os.path.join(OUTPUT_DIRECTORY, file)
+        path = os.path.join(config.OUTPUT_DIR, file)
         write_to_file(path, text)
 
 

@@ -1,17 +1,16 @@
 import os
 import subprocess
-
+import config
 from google.protobuf import descriptor_pb2
 
-DESCRIPTOR_SET_OUT = 'descriptor_set.bin'
-PROTO_DIRECTORY = '../proto/'
+
 
 
 def get_proto_file_names(directory):
     return [file for file in os.listdir(directory) if file.endswith(".proto")]
 
 
-def compile_file(proto_file, proto_path=PROTO_DIRECTORY, descriptor_set_out=DESCRIPTOR_SET_OUT):
+def compile_file(proto_file, proto_path=config.IMPORT_BASE_DIR, descriptor_set_out=config.DESCRIPTOR_SET_OUT):
     try:
         command = [
             'protoc',
@@ -27,13 +26,13 @@ def compile_file(proto_file, proto_path=PROTO_DIRECTORY, descriptor_set_out=DESC
         return False
 
 
-def remove_descriptor_set(descriptor_set_file=DESCRIPTOR_SET_OUT):
+def remove_descriptor_set(descriptor_set_file=config.DESCRIPTOR_SET_OUT):
     if not os.path.exists(descriptor_set_file):
         return
     os.remove(descriptor_set_file)
 
 
-def load_descriptor_set(descriptor_set_file=DESCRIPTOR_SET_OUT):
+def load_descriptor_set(descriptor_set_file=config.DESCRIPTOR_SET_OUT):
     with open(descriptor_set_file, 'rb') as f:
         data = f.read()
     file_descriptor_set = descriptor_pb2.FileDescriptorSet()

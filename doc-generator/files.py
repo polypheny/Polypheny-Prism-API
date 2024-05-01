@@ -1,14 +1,13 @@
 import os
 import re
-
+import config
 import utils as utils
 import proto_utils as putils
 import generator as gen
 
 PROTO_DIRECTORY = '../proto/polyprism'
-README_PATH = '../README.md'
-REQUESTS_SUFFIX = '_requests.proto'
-RESPONSES_SUFFIX = '_responses.proto'
+REQUESTS_SUFFIX = config.REQUEST_FILE_SUFFIX + '.proto'
+RESPONSES_SUFFIX = config.RESPONSE_FILE_SUFFIX + '.proto'
 
 
 def proto_files(repo_path, branch_name, directory=PROTO_DIRECTORY):
@@ -66,7 +65,7 @@ def get_file_description(directory, file_name):
 
 def readme():
     lines = []
-    with open(README_PATH, 'r') as file:
+    with open(config.README_FILE, 'r') as file:
         next(file)
         lines = file.readlines()
     return ''.join(lines)
