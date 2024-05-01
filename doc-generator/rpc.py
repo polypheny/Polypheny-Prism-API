@@ -4,7 +4,7 @@ import generator as gen
 import proto_utils as putils
 import utils as utils
 
-RPC_DEFINITION_FILE_PATH = '../proto/protointerface.proto'
+RPC_DEFINITION_FILE_PATH = '../proto/polyprism/protointerface.proto'
 RPC_DEFINITION_FILE_NAME = 'protointerface.proto'
 
 REQUESTS_MESSAGE_NAME = 'Request'
@@ -32,7 +32,7 @@ REQUIRED_REQUEST_FIELDS = [
 def get_rpcs_from_sets(descriptor, matches, single_responses, single_requests, repo_path, tree_ish, request_path,
                        response_path):
     content = []
-    short_directory = putils.PROTO_DIRECTORY.replace("../", "", 1)
+    short_directory = putils.PROTO_DIRECTORY.replace("../", "", 1) + "polyprism"
     for rpc in matches:
         request, response = rpc
         title = request[1].name.replace(REQUESTS_MESSAGE_NAME, '')

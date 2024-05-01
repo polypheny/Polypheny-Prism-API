@@ -4,7 +4,7 @@ import subprocess
 from google.protobuf import descriptor_pb2
 
 DESCRIPTOR_SET_OUT = 'descriptor_set.bin'
-PROTO_DIRECTORY = '../proto'
+PROTO_DIRECTORY = '../proto/'
 
 
 def get_proto_file_names(directory):
