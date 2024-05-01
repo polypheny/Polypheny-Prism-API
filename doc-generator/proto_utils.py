@@ -83,5 +83,5 @@ def get_field_type(source_code_info, location_path, file_path):
 def get_line_number_for_location(source_code_info, path):
     for location in source_code_info.location:
         if list(location.path) == path:
-            return location.span[0]
+            return location.span[0] + 1
     return None
