@@ -41,9 +41,9 @@ def get_enums_from_file_descriptor(file_descriptor, repo_path, tree_ish):
 
 def enums(repo_path, tree_ish):
     content = []
-    files = putils.get_proto_file_names(putils.PROTO_DIRECTORY)
+    files = putils.get_proto_file_names(putils.PROTO_DIRECTORY + "polyprism")
     for file in files:
-        file_path = os.path.join(putils.PROTO_DIRECTORY, file)
+        file_path = os.path.join(putils.PROTO_DIRECTORY + "polyprism", file)
         putils.compile_file(file_path)
         descriptor_set = putils.load_descriptor_set()
         for descriptor in descriptor_set.file:
