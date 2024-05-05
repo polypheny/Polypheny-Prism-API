@@ -4,13 +4,13 @@ Messages related to statements in a query language and their results.
 
 syntax = "proto3";
 
-import "value.proto";
+import "org/polypheny/prism/value.proto";
 
 option java_multiple_files = true;
 option java_package = "org.polypheny.prism";
 option java_outer_classname = "StatementRequests";
 
-package polypheny.prism;
+package org.polypheny.prism;
 
 /*
 Closes the result set of the statement matching the specified statement id. If no such statement exists, or the result is already closed, this request is ignored.
@@ -149,4 +149,3 @@ message FetchRequest {
   // (Optional) Number of rows to retrieve in this batch. If no fetch size is specified, a default value is used.
   optional int32 fetch_size = 2;
 }
-

@@ -6,23 +6,23 @@ Further messages for error responses are included.
 
 syntax = "proto3";
 
-import "connection_requests.proto";
-import "connection_responses.proto";
-import "meta_requests.proto";
-import "meta_responses.proto";
-import "namespace_meta_requests.proto";
-import "namespace_meta_responses.proto";
-import "statement_requests.proto";
-import "statement_responses.proto";
-import "transaction_requests.proto";
-import "transaction_responses.proto";
-import "value.proto";
+import "org/polypheny/prism/connection_requests.proto";
+import "org/polypheny/prism/connection_responses.proto";
+import "org/polypheny/prism/meta_requests.proto";
+import "org/polypheny/prism/meta_responses.proto";
+import "org/polypheny/prism/namespace_meta_requests.proto";
+import "org/polypheny/prism/namespace_meta_responses.proto";
+import "org/polypheny/prism/statement_requests.proto";
+import "org/polypheny/prism/statement_responses.proto";
+import "org/polypheny/prism/transaction_requests.proto";
+import "org/polypheny/prism/transaction_responses.proto";
+import "org/polypheny/prism/value.proto";
 
 option java_multiple_files = true;
 option java_package = "org.polypheny.prism";
 option java_outer_classname = "ProtoInterfaceProto";
 
-package polypheny.prism;
+package org.polypheny.prism;
 
 /*
 Wrapper message wrapping a specific request message to be sent to the server.

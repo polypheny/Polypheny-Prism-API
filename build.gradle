@@ -43,7 +43,7 @@ task generateVersionProperties {
 
 task packageProto(type: Jar, dependsOn: generateVersionProperties) {
     // Copy the proto files to the desired package structure in the JAR
-    from(fileTree('proto').matching {
+    from(fileTree('org/polypheny/prism').matching {
         include '**/*.proto'
     }) {
         into 'org/polypheny/prism'
@@ -125,4 +125,3 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign publishing.publications.packageProtoPublication
 }
-
