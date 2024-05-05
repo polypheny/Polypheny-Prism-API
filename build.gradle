@@ -1,0 +1,58 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.polypheny.prism'
+version = hasProperty('version') ? version : 'SNAPSHOT'
+
+def majorVersion = 0
+def minorVersion = 0
+if (hasProperty('version')) {
+    // Split version into major and minor components
+    def versionComponents = version.split("\\.")
+    majorVersion = versionComponents[0].toInteger()
+    minorVersion = versionComponents[1].toInteger()
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Add your dependencies here if needed
+}
+
+// Set the temporary folder path for version properties
+def tempPropertiesFolder = file("${buildDir}/tmp")
+def versionPropertiesFile = new File(tempPropertiesFolder, 'prism-api-version.properties')
+
+task generateVersionProperties {
+    outputs.file versionPropertiesFile
+
+    doLast {
+        // Ensure the temp directory exists
+        tempPropertiesFolder.mkdirs()
+        // Define the properties content
+        def propertiesContent = "version=${version}\n" + "majorVersion=${majorVersion}\n" + "minorVersion=${minorVersion}"
+        // Write to the properties file
+        versionPropertiesFile.write(propertiesContent)
+    }
+}
+
+task packageProto(type: Jar, dependsOn: generateVersionProperties) {
+    // Copy the proto files to the desired package structure in the JAR
+    from(fileTree('proto/polyprism').matching {
+        include '**/*.proto'
+    }) {
+        into 'org/polypheny/prism'
+    }
+    // Include the properties file in the same package structure within the JAR
+    from(versionPropertiesFile) {
+        into 'org/polypheny/prism'
+    }
+    archiveFileName = "prism-${version}.jar"
+}
+
+artifacts {
+    archives packageProto
+}
