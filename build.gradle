@@ -41,7 +41,7 @@ task generateVersionProperties {
 
 task packageProto(type: Jar, dependsOn: generateVersionProperties) {
     // Copy the proto files to the desired package structure in the JAR
-    from(fileTree('proto/polyprism').matching {
+    from(fileTree('proto').matching {
         include '**/*.proto'
     }) {
         into 'org/polypheny/prism'
