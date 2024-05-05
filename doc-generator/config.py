@@ -47,7 +47,7 @@ REQUEST_FILE_SUFFIX = '_request'
 # ----------------------------------------------------------------------------------
 
 # The directory containing the proto files
-PROTO_DIR = '../proto/polyprism'
+PROTO_DIR = '../proto'
 
 # ----------------------------------------------------------------------------------
 # PROTO COMPILER

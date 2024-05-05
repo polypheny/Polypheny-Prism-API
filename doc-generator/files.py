@@ -5,12 +5,11 @@ import utils as utils
 import proto_utils as putils
 import generator as gen
 
-PROTO_DIRECTORY = '../proto/polyprism'
 REQUESTS_SUFFIX = config.REQUEST_FILE_SUFFIX + '.proto'
 RESPONSES_SUFFIX = config.RESPONSE_FILE_SUFFIX + '.proto'
 
 
-def proto_files(repo_path, branch_name, directory=PROTO_DIRECTORY):
+def proto_files(repo_path, branch_name, directory=config.PROTO_DIR):
     file_names = putils.get_proto_file_names(directory)
     return generate_file_section(directory, file_names, repo_path, branch_name)
 
