@@ -4,7 +4,7 @@ plugins {
     id 'signing'
 }
 
-group = 'org.polypheny.prism'
+group = 'org.polypheny'
 version = hasProperty('version') ? version : 'SNAPSHOT'
 
 def majorVersion = 0
