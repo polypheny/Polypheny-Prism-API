@@ -1,0 +1,38 @@
+name: Publish to the Maven Central and GitHub Packages
+on:
+    release:
+        types:
+            - published
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+        steps:
+            -   uses: actions/checkout@v4
+            -   name: Set up Java
+                uses: actions/setup-java@v2
+                with:
+                    java-version: '17'
+                    distribution: 'temurin'
+            -   name: Get release version
+                id: get_version
+                run: echo "::set-output name=version::${GITHUB_REF#refs/tags/}"
+            -   name: Publish package
+                run: ./gradlew -Pversion=${{ steps.get_version.outputs.version }} publish
+                env:
+                    MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+                    MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+                    ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+            - name: Upload JAR to GitHub Release
+              uses: actions/upload-release-asset@v1
+              with:
+                    upload_url: ${{ github.event.release.upload_url }}
+                    asset_path: path/to/your/prism-${{ steps.get_version.outputs.version }}.jar
+                    asset_name: prism-${{ steps.get_version.outputs.version }}.jar
+                    asset_content_type: application/java-archive
+              env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
