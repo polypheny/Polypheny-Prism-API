@@ -50,7 +50,7 @@ task packageProto(type: Jar, dependsOn: generateVersionProperties) {
     }
     // Include the properties file in the same package structure within the JAR
     from(versionPropertiesFile) {
-        into 'org/polypheny/prism'
+        into ''
     }
     archiveFileName = "prism-${version}.jar"
 }
