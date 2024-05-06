@@ -28,5 +28,5 @@ This creates a directory called docs containing the generated documentation.
 
 Generate the Python code:
 ```
-python -m grpc_tools.protoc -I proto --python_out . proto/polyprism/*.proto
+python -m grpc_tools.protoc -I . --python_out . org/polypheny/prism/*.proto
 ```
