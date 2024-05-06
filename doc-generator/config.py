@@ -47,7 +47,7 @@ REQUEST_FILE_SUFFIX = '_request'
 # ----------------------------------------------------------------------------------
 
 # The directory containing the proto files
-PROTO_DIR = '../proto'
+PROTO_DIR = '../org/polypheny/prism'
 
 # ----------------------------------------------------------------------------------
 # PROTO COMPILER
@@ -57,7 +57,7 @@ PROTO_DIR = '../proto'
 DESCRIPTOR_SET_OUT = 'descriptor_set.bin'
 
 # The directory from which the imports in the .proto files are resolved.
-IMPORT_BASE_DIR = '../proto/'
+IMPORT_BASE_DIR = '../' #../org/polypheny/prism'
 
 
 # ----------------------------------------------------------------------------------
