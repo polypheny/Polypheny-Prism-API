@@ -37,8 +37,8 @@ jobs:
             wget https://github.com/protocolbuffers/protobuf/releases/download/v26.0/protoc-26.0-linux-x86_64.zip
             unzip protoc-26.0-linux-x86_64.zip -d $HOME/protoc
             
-        - name: Create output directory
-          run: mkdir -p ./api
+      - name: Create output directory
+        run: mkdir -p ./api
 
 
       - name: Generate Go files from Protobuf
