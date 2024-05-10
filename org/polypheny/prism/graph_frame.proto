@@ -8,7 +8,7 @@ option java_multiple_files = true;
 option java_package = "org.polypheny.prism";
 option java_outer_classname = "GraphResultProto";
 
-option go_package = "prism";
+option go_package = "org/polypheny/prism;prism";
 
 package org.polypheny.prism;
 
