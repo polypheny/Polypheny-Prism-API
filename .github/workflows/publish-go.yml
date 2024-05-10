@@ -49,10 +49,10 @@ jobs:
             # Assuming VERSION is in the format 'major.minor'
             IFS='.' read -r MAJOR MINOR <<< "${{ env.VERSION }}"
             # Create a Go file with major and minor constants
-            echo -e "package api\n\n// MajorVersion - Major component of the API version\nconst MajorVersion = $MAJOR\n\n// MinorVersion - Minor component of the API version\nconst MinorVersion = $MINOR" > ./api/version.go
+            echo -e "package prism\n\n// MajorVersion - Major component of the API version\nconst MajorVersion = $MAJOR\n\n// MinorVersion - Minor component of the API version\nconst MinorVersion = $MINOR" > ./api/org/polypheny/prism/version.go
 
       - name: Package Generated Files
-        run: tar -czvf go-api-files-${{ env.VERSION }}.tar.gz ./api
+        run: tar -czvf go-api-files-${{ env.VERSION }}.tar.gz ./api/org/polypheny/prism
 
       - name: Upload ZIP to GitHub Release
         uses: softprops/action-gh-release@v2
