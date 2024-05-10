@@ -1,4 +1,4 @@
-name: Publish Python 🐍 distributions 📦 to PyPI and TestPyPI
+name: Publish Python 🐍 distributions 📦 to PyPI
 on:
     release:
         types:
@@ -11,9 +11,9 @@ jobs:
             contents: write
             packages: write
             id-token: write 
-        environment:
-            name: testpypi
-            url: https://test.pypi.org/p/polypheny-prism-api
+#        environment:
+#            name: testpypi
+#            url: https://test.pypi.org/p/polypheny-prism-api
         steps:
             - uses: actions/checkout@v4
             - name: Set up Python 3.8
