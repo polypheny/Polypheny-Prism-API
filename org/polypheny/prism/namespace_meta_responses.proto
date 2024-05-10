@@ -8,6 +8,8 @@ option java_multiple_files = true;
 option java_package = "org.polypheny.prism";
 option java_outer_classname = "NamespaceMetaResponses";
 
+option go_package = "prism";
+
 package org.polypheny.prism;
 
 /*
