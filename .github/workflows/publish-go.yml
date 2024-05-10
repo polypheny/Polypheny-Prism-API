@@ -45,7 +45,11 @@ jobs:
         run: $HOME/protoc/bin/protoc --proto_path=. --go_out=./api --go_opt=paths=source_relative org/polypheny/prism/*.proto
         
       - name: Create Version Go file
-        run: echo -e "package api\n\n// Version - API version\nconst Version = \"${{ env.VERSION }}\"" > ./api/version.go
+        run: |
+            # Assuming VERSION is in the format 'major.minor'
+            IFS='.' read -r MAJOR MINOR <<< "${{ env.VERSION }}"
+            # Create a Go file with major and minor constants
+            echo -e "package api\n\n// MajorVersion - Major component of the API version\nconst MajorVersion = $MAJOR\n\n// MinorVersion - Minor component of the API version\nconst MinorVersion = $MINOR" > ./api/version.go
 
       - name: Package Generated Files
         run: tar -czvf go-api-files-${{ env.VERSION }}.tar.gz ./api
