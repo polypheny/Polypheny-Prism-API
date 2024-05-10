@@ -53,9 +53,9 @@ jobs:
 
       - name: Package Generated Files
         run: |
-            mv -v ./api/org/polypheny/* ./api/
-            rm -rf ./api/org
-            tar -czvf go-api-files-${{ env.VERSION }}.tar.gz ./api
+            mv -v ./api/org/polypheny/* ./
+            rm -rf ./api
+            tar -czvf go-api-files-${{ env.VERSION }}.tar.gz ./prism
 
       - name: Upload ZIP to GitHub Release
         uses: softprops/action-gh-release@v2
