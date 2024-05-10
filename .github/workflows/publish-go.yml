@@ -1,0 +1,49 @@
+name: Publish Go API files to GitHub Release
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  publish-go:
+    name: Build and publish Go API files to GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go environment
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'  # Specify the Go version.
+
+      - name: Set Version
+        id: version
+        run: |
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Download and Extract Protobuf Compiler
+        run: |
+            wget https://github.com/protocolbuffers/protobuf/releases/download/v26.0/protoc-26.0-linux-x86_64.zip
+            unzip protoc-26.0-linux-x86_64.zip -d $HOME/protoc
+
+      - name: Generate Go files from Protobuf
+        run: $HOME/protoc/bin/protoc --proto_path=. --go_out=./api --go_opt=paths=source_relative org/polypheny/prism/*.proto
+
+      - name: Package Generated Files
+        run: tar -czvf go-api-files-${{ env.VERSION }}.tar.gz ./api
+
+      - name: Create Version Go file
+        run: echo -e "package api\n\n// Version - API version\nconst Version = \"${{ env.VERSION }}\"" > ./api/version.go
+
+      - name: Upload Generated Files to GitHub Release
+        uses: actions/upload-release-asset@v2
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./go-api-files-${{ env.VERSION }}.tar.gz
+          asset_name: go-api-files-${{ env.VERSION }}.tar.gz
+          asset_content_type: application/gzip
