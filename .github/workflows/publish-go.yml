@@ -33,17 +33,16 @@ jobs:
 
       - name: Generate Go files from Protobuf
         run: $HOME/protoc/bin/protoc --proto_path=. --go_out=./api --go_opt=paths=source_relative org/polypheny/prism/*.proto
+        
+      - name: Create Version Go file
+        run: echo -e "package api\n\n// Version - API version\nconst Version = \"${{ env.VERSION }}\"" > ./api/version.go
 
       - name: Package Generated Files
         run: tar -czvf go-api-files-${{ env.VERSION }}.tar.gz ./api
 
-      - name: Create Version Go file
-        run: echo -e "package api\n\n// Version - API version\nconst Version = \"${{ env.VERSION }}\"" > ./api/version.go
-
-      - name: Upload Generated Files to GitHub Release
-        uses: actions/upload-release-asset@v2
+      - name: Upload ZIP to GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./go-api-files-${{ env.VERSION }}.tar.gz
-          asset_name: go-api-files-${{ env.VERSION }}.tar.gz
-          asset_content_type: application/gzip
+          files: go-api-files-${{ env.VERSION }}.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

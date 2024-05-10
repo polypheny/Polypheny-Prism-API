@@ -24,9 +24,8 @@ jobs:
           zip -r protobuf-files-${{ github.event.release.tag_name }}.zip ./org/polypheny/prism
 
       - name: Upload ZIP to GitHub Release
-        uses: actions/upload-release-asset@v2
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./protobuf-files-${{ github.event.release.tag_name }}.zip
-          asset_name: protobuf-files-${{ github.event.release.tag_name }}.zip
-          asset_content_type: application/zip
+          files: protobuf-files-${{ github.event.release.tag_name }}.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
