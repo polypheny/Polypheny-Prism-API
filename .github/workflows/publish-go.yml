@@ -36,6 +36,10 @@ jobs:
         run: |
             wget https://github.com/protocolbuffers/protobuf/releases/download/v26.0/protoc-26.0-linux-x86_64.zip
             unzip protoc-26.0-linux-x86_64.zip -d $HOME/protoc
+            
+        - name: Create output directory
+          run: mkdir -p ./api
+
 
       - name: Generate Go files from Protobuf
         run: $HOME/protoc/bin/protoc --proto_path=. --go_out=./api --go_opt=paths=source_relative org/polypheny/prism/*.proto
