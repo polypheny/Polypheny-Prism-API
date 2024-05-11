@@ -6,6 +6,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <!-- Specify output directory for generated code -->
     <Protobuf_OutputDir>Generated</Protobuf_OutputDir>
+    <PackageId>Polypheny.Prism</PackageId>
+    <RootNamespace>Polypheny.Prism</RootNamespace>
+    <PackageDescription>API communication library for the Polypheny Prism query protocol.</PackageDescription>
   </PropertyGroup>
 
   <!-- Add necessary package references -->
