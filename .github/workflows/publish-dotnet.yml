@@ -40,7 +40,7 @@ jobs:
           # Assumes Generated directory is committed or added during build
 
       - name: Build the project
-        run: dotnet build Prism.csproj --no-restore -c Release -o ./Generated
+        run: dotnet build Prism.csproj --no-restore -c Release
 
       - name: Test the project
         run: dotnet test Prism.csproj --no-build -c Release
