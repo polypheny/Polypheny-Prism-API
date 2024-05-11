@@ -1,0 +1,59 @@
+name: Publish .NET Library to Package Repositories
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  publish-prism:
+    name: Build and publish Prism library to GitHub Packages and NuGet
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET environment
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '6.0'  # Adjust if using a different version
+
+      - name: Create Generated directory
+        run: mkdir -p Generated
+
+      - name: Restore dependencies
+        run: dotnet restore Prism.csproj
+
+      - name: Set Version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)" >> $GITHUB_ENV
+          echo "MINOR_VERSION=$(echo $VERSION | cut -d. -f2)" >> $GITHUB_ENV
+
+      - name: Generate Version File
+        run: |
+          echo "namespace Polypheny.Prism { public static class Version { public const string Major = \"$MAJOR_VERSION\"; public const string Minor = \"$MINOR_VERSION\"; } }" > Generated/Version.cs
+          # Assumes Generated directory is committed or added during build
+
+      - name: Build the project
+        run: dotnet build Prism.csproj --no-restore -c Release -o ./Generated
+
+      - name: Test the project
+        run: dotnet test Prism.csproj --no-build -c Release
+
+      - name: Pack the project
+        run: dotnet pack Prism.csproj --no-build -c Release --output ./nupkgs
+
+      - name: Publish to GitHub Packages
+        run: dotnet nuget push "./nupkgs/*.nupkg" --source "github" --skip-duplicate
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to NuGet
+        run: dotnet nuget push "./nupkgs/*.nupkg" --source "nuget.org" --skip-duplicate
+        env:
+          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }}

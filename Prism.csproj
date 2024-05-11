@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <!-- Specify output directory for generated code -->
+    <Protobuf_OutputDir>Generated</Protobuf_OutputDir>
+  </PropertyGroup>
+
+  <!-- Add necessary package references -->
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.26.1" />
+    <PackageReference Include="Grpc.Tools" Version="2.63.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <!-- Protobuf configurations -->
+  <ItemGroup>
+    <Protobuf Include="org/polypheny/prism/*.proto" OutputDir="$(Protobuf_OutputDir)"  GrpcServices="None" />
+  </ItemGroup>
+
+</Project>
