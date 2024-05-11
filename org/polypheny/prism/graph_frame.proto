@@ -9,6 +9,7 @@ option java_package = "org.polypheny.prism";
 option java_outer_classname = "GraphResultProto";
 
 option go_package = "org/polypheny/prism;prism";
+option csharp_namespace = "Polypheny.Prism";
 
 package org.polypheny.prism;
 
