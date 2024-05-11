@@ -28,11 +28,8 @@ jobs:
                     ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
                     ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
             -   name: Upload JAR to GitHub Release
-                uses: actions/upload-release-asset@v1
+                uses: softprops/action-gh-release@v2
                 with:
-                    upload_url: ${{ github.event.release.upload_url }}
-                    asset_path: build/libs/prism-${{ env.version }}.jar
-                    asset_name: prism-${{ env.version }}.jar
-                    asset_content_type: application/java-archive
+                    files: build/libs/prism-${{ env.version }}.jar
                 env:
                     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
