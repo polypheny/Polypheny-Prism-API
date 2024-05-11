@@ -1,4 +1,4 @@
-name: Publish .NET Library to Package Repositories
+name: Publish .NET Library to NuGet
 
 on:
   release:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   publish-prism:
-    name: Build and publish Prism library to GitHub Packages and NuGet
+    name: Build and publish Prism library to NuGet
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -48,12 +48,5 @@ jobs:
       - name: Pack the project
         run: dotnet pack Prism.csproj --no-build -c Release --output ./nupkgs
 
-      - name: Publish to GitHub Packages
-        run: dotnet nuget push "./nupkgs/*.nupkg" --source "github" --skip-duplicate
-        env:
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Publish to NuGet
-        run: dotnet nuget push "./nupkgs/*.nupkg" --source "nuget.org" --skip-duplicate
-        env:
-          NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "./nupkgs/*.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
