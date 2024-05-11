@@ -16,7 +16,6 @@ import "org/polypheny/prism/statement_requests.proto";
 import "org/polypheny/prism/statement_responses.proto";
 import "org/polypheny/prism/transaction_requests.proto";
 import "org/polypheny/prism/transaction_responses.proto";
-import "org/polypheny/prism/value.proto";
 
 option java_multiple_files = true;
 option java_package = "org.polypheny.prism";
