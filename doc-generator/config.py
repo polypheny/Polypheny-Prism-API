@@ -12,7 +12,7 @@ RPC_DEFINITION_FILE = 'protointerface.proto'
 
 # These fields with their corresponding message number must be present in the top level request message. If on of them
 # is missing, the documentation will not generate and an exception will be thrown.
-# Fields are specified in the forma (field_name, field_number)
+# Fields are specified in the format (field_name, field_number)
 REQUIRED_REQUEST_FIELDS = [
     ('id', 1),
     ('dbms_version_request', 2),
@@ -22,7 +22,7 @@ REQUIRED_REQUEST_FIELDS = [
 
 # These fields with their corresponding message number must be present in the top level request message. If on of them
 # is missing, the documentation will not generate and an exception will be thrown.
-# Fields are specified in the forma (field_name, field_number)
+# Fields are specified in the format (field_name, field_number)
 REQUIRED_RESPONSE_FIELDS = [
     ('id', 1),
     ('last', 2),
