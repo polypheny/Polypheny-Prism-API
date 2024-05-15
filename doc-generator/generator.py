@@ -165,18 +165,18 @@ def generate_single_file_entry(category, file, description, file_link=None):
     return entry
 
 
-def create_directory(directory):
+def _create_directory(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
 
-def write_to_file(file, text):
+def _write_to_file(file, text):
     with open(file, 'w') as file:
         file.write(text)
 
 
 def main(repo_path, tree_ish):
-    create_directory(config.OUTPUT_DIR)
+    _create_directory(config.OUTPUT_DIR)
 
     tasks = [
         generate_overview_doc,
@@ -186,7 +186,7 @@ def main(repo_path, tree_ish):
     for task in tasks:
         file, text = task(repo_path, tree_ish)
         path = os.path.join(config.OUTPUT_DIR, file)
-        write_to_file(path, text)
+        _write_to_file(path, text)
 
 
 if __name__ == '__main__':

@@ -10,24 +10,26 @@
 # This file must be inside the PROTO_DIR also specified in this config.
 RPC_DEFINITION_FILE = 'protointerface.proto'
 
-# These fields must be present in the top level request message. If on of them is missing, the documentation will not
-# generate and an exception will be thrown.
+# These fields with their corresponding message number must be present in the top level request message. If on of them
+# is missing, the documentation will not generate and an exception will be thrown.
+# Fields are specified in the forma (field_name, field_number)
 REQUIRED_REQUEST_FIELDS = [
-    'id',
-    'dbms_version_request',
-    'connection_request',
-    'disconnect_request'
+    ('id', 1),
+    ('dbms_version_request', 2),
+    ('connection_request', 19),
+    ('disconnect_request', 21)
 ]
 
-# These fields must be present in the top level response message. If on of them is missing, the documentation will not
-# generate and an exception will be thrown.
+# These fields with their corresponding message number must be present in the top level request message. If on of them
+# is missing, the documentation will not generate and an exception will be thrown.
+# Fields are specified in the forma (field_name, field_number)
 REQUIRED_RESPONSE_FIELDS = [
-    'id',
-    'last',
-    'error_response',
-    'dbms_version_response',
-    'connection_response',
-    'disconnect_response'
+    ('id', 1),
+    ('last', 2),
+    ('error_response', 256),
+    ('dbms_version_response', 3),
+    ('connection_response', 12),
+    ('disconnect_response', 13)
 ]
 
 # The common suffix of all rpc request messages in the top level request message.
@@ -57,8 +59,7 @@ PROTO_DIR = '../org/polypheny/prism'
 DESCRIPTOR_SET_OUT = 'descriptor_set.bin'
 
 # The directory from which the imports in the .proto files are resolved.
-IMPORT_BASE_DIR = '../' #../org/polypheny/prism'
-
+IMPORT_BASE_DIR = '../'  # ../org/polypheny/prism'
 
 # ----------------------------------------------------------------------------------
 # DOCUMENTATION
