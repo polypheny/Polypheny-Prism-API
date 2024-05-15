@@ -8,7 +8,7 @@ import type_names as type_names
 import utils as utils
 
 
-def get_messages_from_file_descriptor(file_descriptor, repo_path, tree_ish):
+def _get_messages_from_file_descriptor(file_descriptor, repo_path, tree_ish):
     content = []
     if not hasattr(file_descriptor, 'source_code_info'):
         print('ERROR: No source code info!')
@@ -46,6 +46,6 @@ def messages(repo_path, branch_name):
         putils.compile_file(file_path)
         descriptor_set = putils.load_descriptor_set()
         for descriptor in descriptor_set.file:
-            content.extend(get_messages_from_file_descriptor(descriptor, repo_path, branch_name))
+            content.extend(_get_messages_from_file_descriptor(descriptor, repo_path, branch_name))
     putils.remove_descriptor_set()
     return ''.join(content)

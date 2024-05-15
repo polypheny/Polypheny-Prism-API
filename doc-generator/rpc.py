@@ -6,8 +6,8 @@ import utils as utils
 import os
 import config
 
-
 RPC_DEFINITION_FILE = os.path.join(config.PROTO_DIR, config.RPC_DEFINITION_FILE)
+
 
 def get_rpcs_from_sets(descriptor, matches, single_responses, single_requests, repo_path, tree_ish, request_path,
                        response_path):
@@ -22,13 +22,15 @@ def get_rpcs_from_sets(descriptor, matches, single_responses, single_requests, r
 
         request_type = request[1].type_name.split('.')[-1]
         line = putils.get_line_number_for_location(descriptor.source_code_info, message_path)
-        request_link = utils.generate_link(repo_path, tree_ish, os.path.basename(RPC_DEFINITION_FILE), short_directory, line)
+        request_link = utils.generate_link(repo_path, tree_ish, os.path.basename(RPC_DEFINITION_FILE), short_directory,
+                                           line)
         content.append(gen.generate_rpc_message(request_type, request[1].name, True, request_link))
 
         response_type = response[1].type_name.split('.')[-1]
         message_path = [4, response_path, 2, response[0]]
         line = putils.get_line_number_for_location(descriptor.source_code_info, message_path)
-        response_link = utils.generate_link(repo_path, tree_ish, os.path.basename(RPC_DEFINITION_FILE), short_directory, line)
+        response_link = utils.generate_link(repo_path, tree_ish, os.path.basename(RPC_DEFINITION_FILE), short_directory,
+                                            line)
         content.append(gen.generate_rpc_message(response_type, response[1].name, False, response_link))
 
     for single_request in single_requests:
@@ -39,7 +41,8 @@ def get_rpcs_from_sets(descriptor, matches, single_responses, single_requests, r
 
         request_type = single_request[1].type_name.split('.')[-1]
         line = putils.get_line_number_for_location(descriptor.source_code_info, message_path)
-        request_link = utils.generate_link(repo_path, tree_ish, os.path.basename(RPC_DEFINITION_FILE), short_directory, line)
+        request_link = utils.generate_link(repo_path, tree_ish, os.path.basename(RPC_DEFINITION_FILE), short_directory,
+                                           line)
         content.append(gen.generate_rpc_message(request_type, single_request[1].name, False, request_link))
 
     for single_response in single_responses:
@@ -50,7 +53,8 @@ def get_rpcs_from_sets(descriptor, matches, single_responses, single_requests, r
 
         request_type = single_response[1].type_name.split('.')[-1]
         line = putils.get_line_number_for_location(descriptor.source_code_info, message_path)
-        request_link = utils.generate_link(repo_path, tree_ish, os.path.basename(RPC_DEFINITION_FILE), short_directory, line)
+        request_link = utils.generate_link(repo_path, tree_ish, os.path.basename(RPC_DEFINITION_FILE), short_directory,
+                                           line)
         content.append(gen.generate_rpc_message(request_type, single_response[1].name, True, request_link))
 
     return content
@@ -62,17 +66,17 @@ def rpc(repo_path, tree_ish):
     descriptor_set = putils.load_descriptor_set()
     for descriptor in descriptor_set.file:
         check_required_fields(descriptor)
-        matches, single_responses, single_requests = get_rpc_sets_from_file_descriptor(descriptor)
-        requests_path, _ = get_message_descriptor(descriptor, config.REQUESTS_MESSAGE_NAME)
-        responses_path, _ = get_message_descriptor(descriptor, config.RESPONSES_MESSAGE_NAME)
+        matches, single_responses, single_requests = _get_rpc_sets_from_file_descriptor(descriptor)
+        requests_path, _ = _get_message_descriptor(descriptor, config.REQUESTS_MESSAGE_NAME)
+        responses_path, _ = _get_message_descriptor(descriptor, config.RESPONSES_MESSAGE_NAME)
         content.extend(get_rpcs_from_sets(descriptor, matches, single_responses, single_requests, repo_path, tree_ish,
                                           requests_path, responses_path))
     return ''.join(content)
 
 
-def get_message_field_descriptors(file_descriptor, message_name):
+def _get_message_field_descriptors(file_descriptor, message_name):
     message_descriptors = []
-    _, message_descriptor = get_message_descriptor(file_descriptor, message_name)
+    _, message_descriptor = _get_message_descriptor(file_descriptor, message_name)
     if not message_descriptor:
         raise Exception(f'No message with name "{message_name}" found.')
     for field_id, field in enumerate(message_descriptor.field):
@@ -82,29 +86,29 @@ def get_message_field_descriptors(file_descriptor, message_name):
     return message_descriptors
 
 
-def get_message_descriptor(file_descriptor, message_name):
+def _get_message_descriptor(file_descriptor, message_name):
     for message_index, message in enumerate(file_descriptor.message_type):
         if message.name == message_name:
             return message_index, message
     return None
 
 
-def is_request_present(file_descriptor):
-    return get_message_descriptor(file_descriptor, config.REQUESTS_MESSAGE_NAME) is not None
+def _is_request_present(file_descriptor):
+    return _get_message_descriptor(file_descriptor, config.REQUESTS_MESSAGE_NAME) is not None
 
 
-def is_response_resent(file_descriptor):
-    return get_message_descriptor(file_descriptor, config.RESPONSES_MESSAGE_NAME) is not None
+def _is_response_resent(file_descriptor):
+    return _get_message_descriptor(file_descriptor, config.RESPONSES_MESSAGE_NAME) is not None
 
 
-def get_rpc_sets_from_file_descriptor(file_descriptor):
-    if not is_request_present(file_descriptor):
+def _get_rpc_sets_from_file_descriptor(file_descriptor):
+    if not _is_request_present(file_descriptor):
         raise Exception('Request message not present.')
-    if not is_response_resent(file_descriptor):
+    if not _is_response_resent(file_descriptor):
         raise Exception('Response message not present.')
-    request_messages = get_message_field_descriptors(file_descriptor, config.REQUESTS_MESSAGE_NAME)
-    response_messages = get_message_field_descriptors(file_descriptor, config.RESPONSES_MESSAGE_NAME)
-    matches, leftover_requests, leftover_responses = get_matches(request_messages, response_messages)
+    request_messages = _get_message_field_descriptors(file_descriptor, config.REQUESTS_MESSAGE_NAME)
+    response_messages = _get_message_field_descriptors(file_descriptor, config.RESPONSES_MESSAGE_NAME)
+    matches, leftover_requests, leftover_responses = _get_matches(request_messages, response_messages)
     for left_request in leftover_requests:
         if left_request[1].name.endswith(config.REQUESTS_MESSAGE_NAME):
             raise Exception(f'No matching response for {left_request.name}')
@@ -114,7 +118,7 @@ def get_rpc_sets_from_file_descriptor(file_descriptor):
     return matches, leftover_requests, leftover_responses
 
 
-def get_matches(requests, responses):
+def _get_matches(requests, responses):
     matches = []
     leftover_requests = []
     leftover_responses = responses.copy()
@@ -134,16 +138,18 @@ def get_matches(requests, responses):
 
 
 def check_required_fields(file_descriptor):
-    _, request_descriptor = get_message_descriptor(file_descriptor, config.REQUESTS_MESSAGE_NAME)
-    request_fields = [field.name for field in request_descriptor.field]
-    for required_field in config.REQUIRED_REQUEST_FIELDS:
-        if required_field in request_fields:
-            continue
-        raise Exception(f'Required field "{required_field}" not present in request message.')
+    _, request_descriptor = _get_message_descriptor(file_descriptor, config.REQUESTS_MESSAGE_NAME)
+    request_fields = {field.name: field.number for field in request_descriptor.field}
+    _check_for_missing_fields(request_fields, config.REQUIRED_REQUEST_FIELDS)
 
-    _, response_descriptor = get_message_descriptor(file_descriptor, config.RESPONSES_MESSAGE_NAME)
-    response_fields = [field.name for field in response_descriptor.field]
-    for required_field in config.REQUIRED_RESPONSE_FIELDS:
-        if required_field in response_fields:
-            continue
-        raise Exception(f'Required field "{required_field}" not present in response message.')
+    _, response_descriptor = _get_message_descriptor(file_descriptor, config.RESPONSES_MESSAGE_NAME)
+    response_fields = {field.name: field.number for field in response_descriptor.field}
+    _check_for_missing_fields(response_fields, config.REQUIRED_RESPONSE_FIELDS)
+
+
+def _check_for_missing_fields(existing_fields, required_fields):
+    for required_field_name, required_field_number in required_fields:
+        if required_field_name not in existing_fields:
+            raise Exception(f'Required field "{required_field_name}" not present in response message.')
+        if existing_fields[required_field_name] != required_field_number:
+            raise Exception(f'Required field "{required_field_name}" in response message has incorrect number. Expected {required_field_number}, got {existing_fields[required_field_name]}.')

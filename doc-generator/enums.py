@@ -4,7 +4,8 @@ import generator as gen
 import utils as utils
 import proto_utils as putils
 
-def get_enums_from_file_descriptor(file_descriptor, repo_path, tree_ish):
+
+def _get_enums_from_file_descriptor(file_descriptor, repo_path, tree_ish):
     content = []
     if not hasattr(file_descriptor, 'source_code_info'):
         print('ERROR: No source code info!')
@@ -48,6 +49,6 @@ def enums(repo_path, tree_ish):
         putils.compile_file(file_path)
         descriptor_set = putils.load_descriptor_set()
         for descriptor in descriptor_set.file:
-            content.extend(get_enums_from_file_descriptor(descriptor, repo_path, tree_ish))
+            content.extend(_get_enums_from_file_descriptor(descriptor, repo_path, tree_ish))
     putils.remove_descriptor_set()
     return ''.join(content)
