@@ -125,3 +125,11 @@ signing {
     useInMemoryPgpKeys(signingKey, signingPassword)
     sign publishing.publications.packageProtoPublication
 }
+
+tasks.named("publish") {
+    dependsOn(tasks.named("jar"))
+}
+
+tasks.named("publishPackageProtoPublicationPublicationToMavenLocal") {
+    dependsOn(tasks.named("jar"))
+}
