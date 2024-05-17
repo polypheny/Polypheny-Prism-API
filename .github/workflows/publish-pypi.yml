@@ -10,10 +10,7 @@ jobs:
         permissions:
             contents: write
             packages: write
-            id-token: write 
-#        environment:
-#            name: testpypi
-#            url: https://test.pypi.org/p/polypheny-prism-api
+            id-token: write
         steps:
             - uses: actions/checkout@v4
             - name: Set up Python 3.8
@@ -24,11 +21,12 @@ jobs:
               id: version
               run: |
                   if [[ "${{ github.event_name }}" == "release" && "${{ github.event.action }}" == "published" ]]; then
-                      echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+                      echo "${GITHUB_REF#refs/tags/}" > prism-api-version.txt
                   else
                       TIMESTAMP=$(date +'%Y%m%d%H%M%S')
-                      echo "VERSION=0.0.dev${TIMESTAMP}" >> $GITHUB_ENV
-                  fi
+                      echo "0.0.dev${TIMESTAMP}" > prism-api-version.txt
+            - name: Create MANIFEST.in
+              run: echo "include prism-api-version.txt" > MANIFEST.in
             - name: Download protobuf for Linux
               run: |
                   curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v26.0/protoc-26.0-linux-x86_64.zip
@@ -37,11 +35,5 @@ jobs:
               run: bin/protoc --experimental_allow_proto3_optional -I . --python_out . org/polypheny/prism/*.proto
             - name: Build package
               run: python setup.py sdist bdist_wheel
-              env:
-                  VERSION: ${{ env.VERSION }}
-#            - name: Publish distribution 📦 to Test PyPI
-#              uses: pypa/gh-action-pypi-publish@release/v1
-#              with:
-#                  repository-url: https://test.pypi.org/legacy/
             - name: Publish distribution 📦 to PyPI
               uses: pypa/gh-action-pypi-publish@release/v1
