@@ -19,12 +19,7 @@ jobs:
                   python-version: 3.8
             - name: Set Version
               id: version
-              run: |
-                  if [[ "${{ github.event_name }}" == "release" && "${{ github.event.action }}" == "published" ]]; then
-                      echo "${GITHUB_REF#refs/tags/}" > prism-api-version.txt
-                  else
-                      TIMESTAMP=$(date +'%Y%m%d%H%M%S')
-                      echo "0.0.dev${TIMESTAMP}" > prism-api-version.txt
+              run: echo "${GITHUB_REF#refs/tags/}" > prism-api-version.txt
             - name: Create MANIFEST.in
               run: echo "include prism-api-version.txt" > MANIFEST.in
             - name: Download protobuf for Linux
