@@ -34,6 +34,6 @@ jobs:
             - name: Build Protobuf Files
               run: bin/protoc --experimental_allow_proto3_optional -I . --python_out . org/polypheny/prism/*.proto
             - name: Build package
-              run: python setup.py sdist bdist_wheel
+              run: python setup.py sdist
             - name: Publish distribution 📦 to PyPI
               uses: pypa/gh-action-pypi-publish@release/v1
