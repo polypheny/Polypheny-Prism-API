@@ -11,6 +11,8 @@ protoc = protobuf_subproject.get_variable('protoc')
 # ========================
 # Protobuf Code Generation
 # ========================
+gen_dir = meson.current_build_dir() / 'libpolypheny_prism_api.a.p'
+run_command('mkdir', '-p', gen_dir)
 
 prism_gen = generator(protoc,
                       output : ['@BASENAME@.pb.cc', '@BASENAME@.pb.h'],
@@ -48,7 +50,7 @@ prism_files = files(
 prism_src = prism_gen.process(prism_files)
 
 # TODO: find a clean way to specify the include dir for the generated protobuf code
-include_dirs = include_directories('../../buildDir/subprojects/polypheny_prism_api/libpolypheny_prism_api.a.p')
+include_dirs = include_directories('libpolypheny_prism_api.a.p')
 
 polypheny_prism_api_lib = static_library('polypheny_prism_api',
                                          prism_src,
