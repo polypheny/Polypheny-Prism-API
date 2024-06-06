@@ -20,7 +20,7 @@ try:
 except ValueError:
     raise ValueError(f"Invalid version format: {version}. Expected 'major.minor' format.")
 
-with open('org/polypheny/prism/version.py', 'w') as f:
+with open('prism/version.py', 'w') as f:
     f.write(f'MAJOR_VERSION = {major}\n')
     f.write(f'MINOR_VERSION = {minor}\n')
 
