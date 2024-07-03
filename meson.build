@@ -47,10 +47,10 @@ prism_files = files(
 # Library and Dependencies
 # ========================
 
-prism_src = prism_gen.process(prism_files)
+prism_src = prism_gen.process(prism_files, preserve_path_from: meson.current_source_dir())
 
 # TODO: find a clean way to specify the include dir for the generated protobuf code
-include_dirs = include_directories('libpolypheny_prism_api.a.p')
+include_dirs = include_directories('libpolypheny_prism_api.a.p/org/polypheny/prism')
 
 polypheny_prism_api_lib = static_library('polypheny_prism_api',
                                          prism_src,
