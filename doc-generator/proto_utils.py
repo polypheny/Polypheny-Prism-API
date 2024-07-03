@@ -16,6 +16,7 @@ def compile_file(proto_file, proto_path=config.IMPORT_BASE_DIR, descriptor_set_o
             'protoc',
             f'--proto_path={proto_path}',
             f'--descriptor_set_out={descriptor_set_out}',
+            f'--experimental_allow_proto3_optional',
             '--include_source_info',
             proto_file
         ]

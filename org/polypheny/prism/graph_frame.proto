@@ -3,7 +3,7 @@ Messages related to graph frames as used to represent results form the labeled p
 */
 
 syntax = "proto3";
-import "value.proto";
+import "org/polypheny/prism/value.proto";
 
 option java_multiple_files = true;
 option java_package = "org.polypheny.prism";

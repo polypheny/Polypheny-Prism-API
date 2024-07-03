@@ -17,7 +17,7 @@ run_command('mkdir', '-p', gen_dir)
 prism_gen = generator(protoc,
                       output : ['@BASENAME@.pb.cc', '@BASENAME@.pb.h'],
                       arguments : [
-                          '--proto_path=@CURRENT_SOURCE_DIR@/prism',
+                          '--proto_path=@CURRENT_SOURCE_DIR@',
                           '--cpp_out=@BUILD_DIR@',
                           '--experimental_allow_proto3_optional',
                           '@INPUT@'
@@ -25,22 +25,22 @@ prism_gen = generator(protoc,
 )
 
 prism_files = files(
-    'prism/connection_requests.proto',
-    'prism/connection_responses.proto',
-    'prism/document_frame.proto',
-    'prism/error.proto',
-    'prism/graph_frame.proto',
-    'prism/meta_requests.proto',
-    'prism/meta_responses.proto',
-    'prism/namespace_meta_requests.proto',
-    'prism/namespace_meta_responses.proto',
-    'prism/protointerface.proto',
-    'prism/relational_frame.proto',
-    'prism/statement_requests.proto',
-    'prism/statement_responses.proto',
-    'prism/transaction_requests.proto',
-    'prism/transaction_responses.proto',
-    'prism/value.proto'
+    'org/polypheny/prism/connection_requests.proto',
+    'org/polypheny/prism/connection_responses.proto',
+    'org/polypheny/prism/document_frame.proto',
+    'org/polypheny/prism/error.proto',
+    'org/polypheny/prism/graph_frame.proto',
+    'org/polypheny/prism/meta_requests.proto',
+    'org/polypheny/prism/meta_responses.proto',
+    'org/polypheny/prism/namespace_meta_requests.proto',
+    'org/polypheny/prism/namespace_meta_responses.proto',
+    'org/polypheny/prism/protointerface.proto',
+    'org/polypheny/prism/relational_frame.proto',
+    'org/polypheny/prism/statement_requests.proto',
+    'org/polypheny/prism/statement_responses.proto',
+    'org/polypheny/prism/transaction_requests.proto',
+    'org/polypheny/prism/transaction_responses.proto',
+    'org/polypheny/prism/value.proto'
 )
 
 # ========================

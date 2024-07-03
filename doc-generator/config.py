@@ -49,7 +49,7 @@ REQUEST_FILE_SUFFIX = '_request'
 # ----------------------------------------------------------------------------------
 
 # The directory containing the proto files
-PROTO_DIR = '../prism'
+PROTO_DIR = '../org/polypheny/prism'
 
 # ----------------------------------------------------------------------------------
 # PROTO COMPILER
