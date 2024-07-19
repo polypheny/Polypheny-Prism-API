@@ -16,6 +16,7 @@ import "org/polypheny/prism/statement_requests.proto";
 import "org/polypheny/prism/statement_responses.proto";
 import "org/polypheny/prism/transaction_requests.proto";
 import "org/polypheny/prism/transaction_responses.proto";
+import "org/polypheny/prism/stream.proto";
 
 option java_multiple_files = true;
 option java_package = "org.polypheny.prism";
@@ -64,6 +65,7 @@ message Request {
     RollbackRequest rollback_request = 34;
     ConnectionPropertiesUpdateRequest connection_properties_update_request = 35;
     CloseResultRequest close_result_request = 36;
+    StreamFetchRequest stream_fetch_request = 37;
   }
 }
 
@@ -113,5 +115,6 @@ message Response {
     RollbackResponse rollback_response = 22;
     ConnectionPropertiesUpdateResponse connection_properties_update_response = 23;
     CloseResultResponse close_result_response = 34;
+    StreamFrame stream_frame = 35;
   }
 }
