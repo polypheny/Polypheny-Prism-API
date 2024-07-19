@@ -1,0 +1,39 @@
+/*
+Messages related to the streaming of large values
+*/
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.polypheny.prism";
+option java_outer_classname = "Stream";
+
+option go_package = "org/polypheny/prism;prism";
+option csharp_namespace = "Polypheny.Prism";
+
+package org.polypheny.prism;
+
+/*
+This message represents the request sent by the client to the server to fetch a consecutive section of a large binary value.
+This functionality is used to stream large binary values in results.
+ */
+message StreamFetchRequest {
+  // Statement of the id to which the result containing the stream belongs.
+  int32 statement_id = 1;
+  // Id of the stream to fetch from.
+  int64 stream_id = 2;
+  // Position in the stream from which to begin fetching.
+  int64 position = 3;
+  // Number of bytes to fetch.
+  int32 length = 4;
+}
+
+/*
+This message represents a section of a stream transmitted between either client or server.
+ */
+message StreamFrame {
+  // A consecutive section of the stream.
+  bytes data = 1;
+  // Signals whether this frame contains data up to the end of the stream.
+  bool is_last = 2;
+}
