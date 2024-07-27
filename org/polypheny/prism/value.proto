@@ -91,7 +91,7 @@ enum ProtoPolyType {
   // Dynamic star type (used for dynamic column projection).
   DYNAMIC_STAR = 50;
   // Geometric data type.
-  GEOMETRY= 51;
+  GEOMETRY = 51;
   // Symbol type.
   SYMBOL = 52;
   // JSON data type.
@@ -245,8 +245,17 @@ message ProtoString {
 Represents binary data.
 */
 message ProtoBinary {
-  // Binary data of arbitrary length.
-  bytes binary = 1;
+  oneof data {
+    // Binary data of arbitrary length.
+    bytes binary = 1;
+    // Id to a stream from which the data can be fetched continuously.
+    int64 stream_id = 2;
+  }
+  /*
+  Only in case a stream_id is returned. This flag indicates that the stream must be fetched in forward direction.
+  Thus the start position in each fetch request must be after the last byte returned by the previous one.
+   */
+  optional bool is_forward_only = 3;
 }
 
 /*
