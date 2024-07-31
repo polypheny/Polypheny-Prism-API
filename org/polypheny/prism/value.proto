@@ -294,8 +294,17 @@ message ProtoDocument {
 Represents a file containing large binary data.
  */
 message ProtoFile {
-  // The content of the file in binary.
-  bytes binary = 1;
+  oneof data {
+    // Binary data of arbitrary length.
+    bytes binary = 1;
+    // Id to a stream from which the data can be fetched continuously.
+    int64 stream_id = 2;
+  }
+  /*
+  Only in case a stream_id is returned. This flag indicates that the stream must be fetched in forward direction.
+  Thus the start position in each fetch request must be after the last byte returned by the previous one.
+   */
+  optional bool is_forward_only = 3;
 }
 
 /*
