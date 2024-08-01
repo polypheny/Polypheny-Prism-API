@@ -256,6 +256,11 @@ message ProtoBinary {
   Thus the start position in each fetch request must be after the last byte returned by the previous one.
    */
   optional bool is_forward_only = 3;
+  /*
+  Only in case a stream_id is returned. This field contains the statement_id used to fetch from the stream which is
+  identified using the statement_id of the statement that produced the result containing the streamed value and the stream_id above.
+   */
+  optional int32 statement_id = 4;
 }
 
 /*
@@ -305,6 +310,11 @@ message ProtoFile {
   Thus the start position in each fetch request must be after the last byte returned by the previous one.
    */
   optional bool is_forward_only = 3;
+  /*
+  Only in case a stream_id is returned. This field contains the statement_id used to fetch from the stream which is
+  identified using the statement_id of the statement that produced the result containing the streamed value and the stream_id above.
+   */
+  optional int32 statement_id = 4;
 }
 
 /*
