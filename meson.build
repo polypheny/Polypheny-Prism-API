@@ -41,7 +41,8 @@ prism_files = files(
     'org/polypheny/prism/transaction_requests.proto',
     'org/polypheny/prism/transaction_responses.proto',
     'org/polypheny/prism/value.proto',
-    'org/polypheny/prism/stream.proto'
+    'org/polypheny/prism/stream_requests.proto',
+    'org/polypheny/prism/stream_responses.proto'
 )
 
 # ========================

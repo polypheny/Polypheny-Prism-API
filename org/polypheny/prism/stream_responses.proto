@@ -1,0 +1,23 @@
+/*
+Messages related to the streaming of large values
+*/
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.polypheny.prism";
+option java_outer_classname = "StreamResponses";
+
+option go_package = "org/polypheny/prism;prism";
+option csharp_namespace = "Polypheny.Prism";
+
+package org.polypheny.prism;
+
+/*
+This message represents an acknowledgement that a frame of data, sent as part of a stream had successfully been received.
+Simultaneously it represents a request to the receiver to send more frames of data if available and ready.
+ */
+message StreamAcknowledgement {
+  // Id of the stream to which the data had been appended.
+  int64 streamId = 1;
+}

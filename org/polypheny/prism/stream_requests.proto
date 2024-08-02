@@ -1,0 +1,60 @@
+/*
+Messages related to the streaming of large values
+*/
+
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.polypheny.prism";
+option java_outer_classname = "StreamRequests";
+
+option go_package = "org/polypheny/prism;prism";
+option csharp_namespace = "Polypheny.Prism";
+
+package org.polypheny.prism;
+
+/*
+This message represents the request sent by the client to the server to fetch a consecutive section of a large binary value.
+This functionality is used to stream large binary values in results.
+ */
+message StreamFetchRequest {
+  // Statement of the id to which the result containing the stream belongs.
+  int32 statement_id = 1;
+  // Id of the stream to fetch from.
+  int64 stream_id = 2;
+  // Position in the stream from which to begin fetching.
+  int64 position = 3;
+  // Number of bytes to fetch.
+  int32 length = 4;
+}
+
+/*
+This message represents a section of a stream transmitted between either client or server.
+ */
+message StreamFrame {
+  // The data contained in this frame of the stream which is either of the binary or string kind.
+  oneof data {
+    // Field used to store the binary data contained in this stream frame.
+    bytes binary = 1;
+    // Field used to store the string data contained in this stream frame.
+    string string = 2;
+  }
+  // This flag indicates this frame is the last ono to denote the end of stream.
+  bool is_last = 3;
+}
+
+/*
+This message represents a single frame of data sent to the server as part of a stream as specified by the stream_id.
+If no stream_id is set, a new stream is opened on the server side with the frame as the new streams first frame.
+The StreamAcknowledgement message sent by the server then contains the stream_id of the new stream to be usd to add more data.
+ */
+message StreamSendRequest {
+  // The frame of data to be sent to the receiver.
+  StreamFrame frame = 1;
+  /*
+  This field indicates to which stream to append this specific frame of data. If this field is left empty,
+  a new stream is opened on the server side with this frame as the new streams first frame.
+  The StreamAcknowledgement message sent by the server then contains the stream_id of the new stream to be usd to add more data.
+   */
+  optional int64 stream_id = 2;
+}
