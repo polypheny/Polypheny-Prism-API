@@ -19,5 +19,5 @@ Simultaneously it represents a request to the receiver to send more frames of da
  */
 message StreamAcknowledgement {
   // Id of the stream to which the data had been appended.
-  int64 streamId = 1;
+  int64 stream_id = 1;
 }
