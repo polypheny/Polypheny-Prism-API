@@ -16,8 +16,9 @@ package org.polypheny.prism;
 /*
 This message represents an acknowledgement that a frame of data, sent as part of a stream had successfully been received.
 Simultaneously it represents a request to the receiver to send more frames of data if available and ready.
+Further it can communicate the sender that no more data is required.
  */
 message StreamAcknowledgement {
   // Id of the stream to which the data had been appended.
-  int64 stream_id = 1;
+  bool close_stream = 1;
 }
