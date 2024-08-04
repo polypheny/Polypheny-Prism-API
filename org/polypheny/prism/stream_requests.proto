@@ -45,16 +45,14 @@ message StreamFrame {
 
 /*
 This message represents a single frame of data sent to the server as part of a stream as specified by the stream_id.
-If no stream_id is set, a new stream is opened on the server side with the frame as the new streams first frame.
-The StreamAcknowledgement message sent by the server then contains the stream_id of the new stream to be usd to add more data.
  */
 message StreamSendRequest {
   // The frame of data to be sent to the receiver.
   StreamFrame frame = 1;
+  /* This field indicates to which statement the stream is related to. */
+  int32 statement_id = 2;
   /*
-  This field indicates to which stream to append this specific frame of data. If this field is left empty,
-  a new stream is opened on the server side with this frame as the new streams first frame.
-  The StreamAcknowledgement message sent by the server then contains the stream_id of the new stream to be usd to add more data.
+  This field indicates to which stream to append this specific frame of data.
    */
-  optional int64 stream_id = 2;
+  int64 stream_id = 3;
 }
