@@ -278,21 +278,11 @@ message ProtoList {
 }
 
 /*
-Defines a key-value pair using ProtoValues for both key and value.
-*/
-message ProtoEntry {
-  // The key of the entry.
-  ProtoValue key = 1;
-  // The value of the entry.
-  ProtoValue value = 2;
-}
-
-/*
 Represents a document consisting of multiple ProtoEntry items.
 */
 message ProtoDocument {
-  // The list of ProtoEntry items forming the document.
-  repeated ProtoEntry entries = 1;
+  // The map of proto values representing the document's entries.
+  map<string, ProtoValue> entries = 1;
 }
 
 /*
@@ -327,7 +317,7 @@ message ProtoNode {
   // The name of the node as specified on creation.
   string name = 2;
   // A map of key-value pairs of proto values. These are used as a map to store properties with their corresponding names.
-  repeated ProtoEntry properties = 3;
+  map<string, ProtoValue> properties = 3;
   // This list contains all labels associated with this node. Normal strings are used instead of ProtoStrings.
   repeated string labels = 4;
 }
@@ -343,7 +333,7 @@ message ProtoEdge {
   // The name of the node as specified on creation.
   string name = 2;
   // A map of key-value pairs of proto values. These are used as a map to store properties with their corresponding names.
-  repeated ProtoEntry properties = 3;
+  map<string, ProtoValue> properties = 3;
   // This list contains all labels associated with this node. Normal strings are used instead of ProtoStrings.
   repeated string labels = 4;
   // The system internal unique identifier of the node from which this edge originates.
