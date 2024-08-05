@@ -17,18 +17,15 @@ package org.polypheny.prism;
 /*
  * The GraphFrame represents the non-relational result of a query in the labeled property graph model.
  * If the query returns a relational result, such as when aggregations are used or specific properties are returned,
- * a relational frame is used. The GraphFrame is used for results where a set of nodes, edges, or paths is returned.
- * This selection is exclusive, meaning only one of the lists can be populated at a time. If a result produces multiple
- * frames (used to transmit large results), all results will be of the same type (relational vs. graph) and contain the
- * same element type (nodes, edges or paths).
+ * a relational frame is used. The GraphFrame is used for results where a set of nodes and/or edges is returned.
+ * If a result produces multiple frames (used to transmit large results), all results will be of the same type (relational vs. graph).
+ * If the result contains paths, these are represented as a list of nodes and a list of edges. Thus both lists can be populated at once.
  */
 message GraphFrame {
   // Field used to represent a set of nodes as part of a result. If this field is populated all others must not be set.
   repeated ProtoNode nodes = 1;
   // Field used to represent a set of edges as part of a result. If this field is populated all others must not be set.
   repeated ProtoEdge edges = 2;
-  // Field used to represent a set of paths as part of a result. If this field is populated all others must not be set.
-  repeated ProtoPath paths = 3;
 }
 
 
