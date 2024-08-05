@@ -350,11 +350,3 @@ message ProtoEdge {
     NONE = 3;
   }
 }
-
-/*
- * This message represents an edge in the labeled property graph model.
- * Paths cannot yet be returned by polypheny. This message thus is a placeholder to be implemented once the functionality is provided.
- */
-message ProtoPath {
-
-}
