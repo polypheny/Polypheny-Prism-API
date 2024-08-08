@@ -28,6 +28,8 @@ message ConnectionRequest {
   optional string password = 6;
   // (Optional) Contains specific properties related to the connection, such as timeout settings or database preferences.
   optional ConnectionProperties connection_properties = 4;
+  // Feature vector to specify features supported by this client. If empty, defaults are used.
+  repeated string features = 7;
 }
 
 /*

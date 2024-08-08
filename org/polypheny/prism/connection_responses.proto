@@ -27,6 +27,12 @@ message ConnectionResponse {
   int32 major_api_version = 2;
   // The minor version number of the server’s API. Provides finer granularity about the server’s capabilities.
   int32 minor_api_version = 3;
+  /*
+  This list contains all features specified in the connection request that are either not known to the server or not
+  supported by the polypheny instance used. All features specified in the connection request that are not listed here
+  were valid and had been applied.
+   */
+  repeated string unknown_features = 4;
 }
 
 /*
