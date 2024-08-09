@@ -26,8 +26,8 @@ message ConnectionRequest {
   optional string username = 5;
   // (Optional) The password associated with the specified username for authentication purposes.
   optional string password = 6;
-  // (Optional) Contains specific properties related to the connection, such as timeout settings or database preferences.
-  optional ConnectionProperties connection_properties = 4;
+  // Map storing properties for this connection as key-value pairs. If an empty map is sent, default are used.
+   map<string, string> properties = 4;
   // Feature vector to specify features supported by this client. If empty, defaults are used.
   repeated string features = 7;
 }
@@ -38,10 +38,10 @@ It allows clients to specify certain behaviors and settings for the connection, 
 */
 message ConnectionPropertiesUpdateRequest {
   /*
-  Specifies the new settings for the connection.
-  Contains properties such as transaction auto-commit status and target namespace preference.
-  */
-  ConnectionProperties connection_properties = 4;
+  Map storing properties for this connection as key-value pairs. If an empty map is sent, default are used.
+  Properties previously set but not included in the update remain unaltered.
+   */
+  map<string, string> properties = 1;
 }
 
 /*

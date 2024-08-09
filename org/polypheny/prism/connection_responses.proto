@@ -33,6 +33,11 @@ message ConnectionResponse {
   were valid and had been applied.
    */
   repeated string unknown_features = 4;
+  /*
+    This list contains the names of all properties include din the corresponding update request that are not available
+    on the connected polypheny instance.
+   */
+  repeated string unknown_properties = 5;
 }
 
 /*
@@ -54,8 +59,13 @@ message ConnectionCheckResponse {
 
 /*
 The ConnectionPropertiesUpdateResponse message is sent by the server in response to a ConnectionPropertiesUpdateRequest from the client.
-It acknowledges the success of the requested connection properties update.
-This message does not contain any fields. It serves as an acknowledgment of the update process for the connection properties.
+This message contains a list of all properties unknown to the connected polypheny instance. All properties include in the request
+that are not included in this list can be regarded as valid and applied.
 */
 message ConnectionPropertiesUpdateResponse {
+  /*
+    This list contains the names of all properties include din the corresponding update request that are not available
+    on the connected polypheny instance.
+   */
+  repeated string unknown_properties = 1;
 }
