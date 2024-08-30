@@ -1,6 +1,7 @@
 import os
 
 from google.protobuf.descriptor_pb2 import FieldDescriptorProto
+
 import config
 import generator as gen
 import proto_utils as putils
@@ -15,7 +16,7 @@ def _get_messages_from_file_descriptor(file_descriptor, repo_path, tree_ish):
         return content
     short_directory = config.IMPORT_BASE_DIR.replace("../", "", 1)
     file_link = utils.generate_link(repo_path, tree_ish, file_descriptor.name, short_directory)
-    content.append(gen.generate_title(file_descriptor.name, file_link))
+    content.append(gen.generate_title(utils.reduce_name(file_descriptor.name), file_link))
 
     for message_index, message in enumerate(file_descriptor.message_type):
         message_path = [4, message_index]

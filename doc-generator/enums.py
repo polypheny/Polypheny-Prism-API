@@ -37,7 +37,7 @@ def _get_enums_from_file_descriptor(file_descriptor, repo_path, tree_ish):
                 value_description = putils.get_description_for_location(file_descriptor.source_code_info, value_path)
                 content.append(gen.generate_value_entry(value.name, value.number, value_description))
     if content:
-        content.insert(0, gen.generate_title(file_descriptor.name))
+        content.insert(0, gen.generate_title(utils.reduce_name(file_descriptor.name)))
     return content
 
 
