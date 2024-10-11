@@ -43,6 +43,6 @@ setup(
     license="Apache License, Version 2.0",
     packages=['org/polypheny/prism'],
     install_requires=[
-        "protobuf==4.24.3",
+        "protobuf==5.27.2",
     ],
 )
