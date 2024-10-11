@@ -253,3 +253,8 @@ nbdist/
 
 # Ignore dynamically generated version file
 src/main/resources/version.properties
+
+polypheny_prism_api.egg-info
+polypheny_prism_api.egg-info/*
+org/polypheny/prism/*.py
+prism-api-version.txt
