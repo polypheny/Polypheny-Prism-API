@@ -5,15 +5,18 @@ plugins {
 }
 
 group = 'org.polypheny'
-version = hasProperty('version') ? version : 'SNAPSHOT'
 
 def majorVersion = 0
 def minorVersion = 0
-if (hasProperty('version')) {
-    // Split version into major and minor components
-    def versionComponents = version.split("\\.")
-    majorVersion = versionComponents[0].toInteger()
-    minorVersion = versionComponents[1].toInteger()
+if (hasProperty('version') ) {
+    if ( version == "unspecified" ) {
+        version = 'SNAPSHOT'
+    } else {
+        // Split version into major and minor components
+        def versionComponents = version.split("\\.")
+        majorVersion = versionComponents[0].toInteger()
+        minorVersion = versionComponents[1].toInteger()
+    }
 }
 
 repositories {
