@@ -136,3 +136,7 @@ tasks.named("publish") {
 tasks.named("publishPackageProtoPublicationPublicationToMavenLocal") {
     dependsOn(tasks.named("jar"))
 }
+
+tasks.named("signPackageProtoPublicationPublication") {
+    dependsOn(tasks.named("jar"))
+}
