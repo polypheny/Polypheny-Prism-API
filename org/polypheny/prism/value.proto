@@ -146,6 +146,10 @@ message ProtoValue {
     ProtoDocument document = 18;
     // Field used to represent a FILE type such as FILE, IMAGE, VIDEO or AUDIO.
     ProtoFile file = 19;
+    // Field used to represent a node
+    ProtoNode node = 20;
+    // Field used to represent an edge
+    ProtoEdge edge = 21;
   }
 }
 
