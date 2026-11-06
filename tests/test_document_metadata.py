@@ -72,7 +72,8 @@ class DocumentMetadataContractTest(unittest.TestCase):
         )
 
     def test_all_metadata_survives_entities_response_round_trip(self):
-        sample = {"patient_id": "p1", "complications": {"renal": None}}
+        sample = {"patient_id": "p1", "complications": {"renal": None},
+                  "literal.key": "value", r"path\key": True}
         response = self.meta.EntitiesResponse()
         document = response.entities.add().document
         document.namespace_name = "patients_symptoms"
@@ -80,9 +81,12 @@ class DocumentMetadataContractTest(unittest.TestCase):
         document.fields.add(field_path="patient_id", type_name="string", is_optional=False)
         document.fields.add(field_path="complications", type_name="object", is_optional=True)
         document.fields.add(field_path="complications.renal", type_name="null", is_optional=True)
+        document.fields.add(field_path=r"literal\.key", type_name="string", is_optional=False)
+        document.fields.add(field_path=r"path\\key", type_name="bool", is_optional=False)
         document.sample_document_json = json.dumps(sample)
         document.document_indexes.add(field_path="patient_id", index_type="hash", unique=True)
         document.document_indexes.add(field_path="complications.renal", index_type="btree", unique=False)
+        document.document_indexes.add(field_path=r"literal\.key", index_type="hash", unique=False)
 
         result = self.meta.EntitiesResponse.FromString(response.SerializeToString())
         self.assertEqual(result, response)
@@ -93,13 +97,15 @@ class DocumentMetadataContractTest(unittest.TestCase):
         self.assertEqual(
             [(item.field_path, item.type_name, item.is_optional) for item in actual.fields],
             [("patient_id", "string", False), ("complications", "object", True),
-             ("complications.renal", "null", True)],
+             ("complications.renal", "null", True), (r"literal\.key", "string", False),
+             (r"path\\key", "bool", False)],
         )
         self.assertTrue(actual.HasField("sample_document_json"))
         self.assertEqual(json.loads(actual.sample_document_json), sample)
         self.assertEqual(
             [(item.field_path, item.index_type, item.unique) for item in actual.document_indexes],
-            [("patient_id", "hash", True), ("complications.renal", "btree", False)],
+            [("patient_id", "hash", True), ("complications.renal", "btree", False),
+             (r"literal\.key", "hash", False)],
         )
 
     def test_sample_presence_and_empty_collection(self):

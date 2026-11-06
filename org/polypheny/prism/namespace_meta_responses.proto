@@ -251,6 +251,8 @@ Describes a field or nested attribute within a document collection.
 */
 message DocumentField {
   // The field path in dot notation (e.g., "complications.respiratory.onset_day").
+  // Structural path segments are separated by '.'; literal '.' and '\' inside a key segment
+  // are escaped with a preceding '\', so a literal backslash is doubled.
   string field_path = 1;
   // The inferred or declared type: "string", "int", "double", "bool", "array", "object", "null", or "mixed".
   // A mixture of integer and floating-point values is represented as "double"; other heterogeneous types as "mixed".
@@ -264,7 +266,8 @@ message DocumentField {
 Describes an indexed field within a document collection.
 */
 message DocumentIndex {
-  // The indexed field path in dot notation (e.g., "patient_id").
+  // The indexed field path uses the same escaping as DocumentField.field_path (e.g., "patient_id").
+  // Index wildcard segments (e.g., "$**") retain their usual meaning.
   string field_path = 1;
   // The index method, e.g., "hash", "btree", or "wildcard".
   string index_type = 2;
