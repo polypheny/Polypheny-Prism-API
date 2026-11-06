@@ -30,3 +30,13 @@ Generate the Python code:
 ```
 python -m grpc_tools.protoc -I . --python_out . org/polypheny/prism/*.proto
 ```
+
+### Test protocol contracts
+
+The Python contract tests compile the checked-out definitions into a temporary directory
+and check the document metadata messages, wire compatibility, and optional-field presence.
+
+```
+python -m pip install -r requirements.txt
+python -m unittest discover -s tests -v
+```
