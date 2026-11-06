@@ -229,9 +229,50 @@ message Graph {
 }
 
 /*
-The Document message will be used to encapsulate the metadata related to a document entity.
-The structure is presently empty, but it’s expected to be expanded with attributes pertinent to documents in future updates.
-At this moment, the Document message serves as a placeholder and does not possess any fields.
+The Document message encapsulates metadata related to a document collection entity.
+Field metadata describes known fields and is not an enforced schema for a schemaless collection.
+When inferred from a sample, fields and their types need not describe every document in the collection.
 */
 message Document {
+  // The namespace where the document collection is located.
+  string namespace_name = 1;
+  // The name of the document collection (e.g., "symptoms").
+  string collection_name = 2;
+  // Known field paths or keys, which may be inferred from a bounded sample of documents.
+  repeated DocumentField fields = 3;
+  // An optional sample document as JSON; absent when no sample is available, e.g., for an empty collection.
+  optional string sample_document_json = 4;
+  // Indexes available to the server for this collection; an empty list means no index metadata is available.
+  repeated DocumentIndex document_indexes = 5;
+}
+
+/*
+Describes a field or nested attribute within a document collection.
+*/
+message DocumentField {
+  // The field path in dot notation (e.g., "complications.respiratory.onset_day").
+  // Structural path segments are separated by '.'; literal '.' and '\' inside a key segment
+  // are escaped with a preceding '\', so a literal backslash is doubled.
+  string field_path = 1;
+  // The inferred or declared type: "string", "int", "double", "bool", "array", "object", "null", or "mixed".
+  // A mixture of integer and floating-point values is represented as "double"; other heterogeneous types as "mixed".
+  string type_name = 2;
+  // True if this field was missing or null in the sample, or is declared optional.
+  // False describes the observed sample, not a guarantee that future documents contain a non-null value.
+  bool is_optional = 3;
+}
+
+/*
+Describes an indexed field within a document collection.
+*/
+message DocumentIndex {
+  // The indexed field path uses the same escaping as DocumentField.field_path (e.g., "patient_id").
+  // Index wildcard segments (e.g., "$**") retain their usual meaning.
+  string field_path = 1;
+  // The index method, e.g., "hash", "btree", or "wildcard".
+  string index_type = 2;
+  // True if a single-field index declares uniqueness for this field; false for compound-index components.
+  // Uniqueness applies only to documents covered by that index (e.g., a sparse or partial index),
+  // and is not a guarantee that every document in the collection has a distinct value for this field.
+  bool unique = 3;
 }

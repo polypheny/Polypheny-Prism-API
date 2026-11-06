@@ -1,6 +1,8 @@
 ### Custom
 # Generated files
 gen/
+__pycache__/
+.venv/
 
 
 
