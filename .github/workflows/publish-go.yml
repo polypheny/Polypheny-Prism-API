@@ -1,65 +1,84 @@
-name: Publish Go API files to GitHub Release
+name: Build and publish Prism Go archive
 
 on:
+  pull_request:
+    paths:
+      - '.github/workflows/publish-go.yml'
+      - 'org/polypheny/prism/*.proto'
+  workflow_dispatch:
   release:
-    types:
-      - published
+    types: [published]
+
+env:
+  VERSION: ${{ github.event.release.tag_name || '2.2' }}
 
 jobs:
-  publish-go:
-    name: Build and publish Go API files to GitHub Release
+  build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      actions: write
-
+      contents: read
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Go environment
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
-          go-version: '1.18'  # Specify the Go version.
+          go-version: '1.18'
+          cache: false
 
-      - name: Install Protoc Go Plugin
-        run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-
-      - name: Add GOPATH/bin to PATH
-        run: echo "$GOPATH/bin" >> $GITHUB_PATH
-
-      - name: Set Version
-        id: version
+      - name: Build Go archive
         run: |
-            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a Prism version in major.minor format: $VERSION" >&2
+            exit 1
+          fi
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.33.0
+          export PATH="$(go env GOPATH)/bin:$PATH"
+          curl -fsSLO https://github.com/protocolbuffers/protobuf/releases/download/v26.0/protoc-26.0-linux-x86_64.zip
+          unzip -q protoc-26.0-linux-x86_64.zip
 
-      - name: Download and Extract Protobuf Compiler
+          mkdir -p generated
+          bin/protoc -I . --go_out=generated --go_opt=paths=source_relative org/polypheny/prism/*.proto
+          IFS=. read -r major minor <<< "$VERSION"
+          cat > generated/org/polypheny/prism/version.go <<EOF
+          package prism
+
+          // MajorVersion is the major component of the API version.
+          const MajorVersion = $major
+
+          // MinorVersion is the minor component of the API version.
+          const MinorVersion = $minor
+          EOF
+          tar -C generated/org/polypheny -czf "go-api-files-${VERSION}.tar.gz" prism
+
+      - name: Compile generated Go package
         run: |
-            wget https://github.com/protocolbuffers/protobuf/releases/download/v26.0/protoc-26.0-linux-x86_64.zip
-            unzip protoc-26.0-linux-x86_64.zip -d $HOME/protoc
-            
-      - name: Create output directory
-        run: mkdir -p ./api
+          archive="$PWD/go-api-files-${VERSION}.tar.gz"
+          cd "$(mktemp -d)"
+          tar -xzf "$archive"
+          go mod init prism-package-check
+          go mod edit -require=google.golang.org/protobuf@v1.33.0
+          go test -mod=mod ./prism
 
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'release'
+        with:
+          name: prism-go-archive
+          path: go-api-files-${{ env.VERSION }}.tar.gz
+          if-no-files-found: error
 
-      - name: Generate Go files from Protobuf
-        run: $HOME/protoc/bin/protoc --proto_path=. --go_out=./api --go_opt=paths=source_relative org/polypheny/prism/*.proto
-        
-      - name: Create Version Go file
-        run: |
-            # Assuming VERSION is in the format 'major.minor'
-            IFS='.' read -r MAJOR MINOR <<< "${{ env.VERSION }}"
-            # Create a Go file with major and minor constants
-            echo -e "package prism\n\n// MajorVersion - Major component of the API version\nconst MajorVersion = $MAJOR\n\n// MinorVersion - Minor component of the API version\nconst MinorVersion = $MINOR" > ./api/org/polypheny/prism/version.go
+  publish:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: prism-go-archive
 
-      - name: Package Generated Files
-        run: |
-            mv -v ./api/org/polypheny/* ./
-            rm -rf ./api
-            tar -czvf go-api-files-${{ env.VERSION }}.tar.gz ./prism
-
-      - name: Upload ZIP to GitHub Release
+      - name: Attach Go archive to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: go-api-files-${{ env.VERSION }}.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          fail_on_unmatched_files: true

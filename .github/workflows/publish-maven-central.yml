@@ -1,35 +1,113 @@
 name: Publish to the Maven Central and GitHub Packages
+
 on:
-    release:
-        types:
-            - published
+  release:
+    types:
+      - published
+  pull_request:
+    paths:
+      - '.github/workflows/publish-maven-central.yml'
+      - 'build.gradle'
+      - 'settings.gradle'
+      - 'gradle/**'
+      - 'gradlew'
+      - 'README.md'
+      - 'org/polypheny/prism/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PRISM_VERSION: ${{ github.event.release.tag_name || '2.2' }}
+
 jobs:
-    publish:
-        runs-on: ubuntu-latest
-        permissions:
-            contents: write
-            packages: write
-        steps:
-            -   uses: actions/checkout@v4
-            -   name: Set up Java
-                uses: actions/setup-java@v4
-                with:
-                    java-version: '17'
-                    distribution: 'temurin'
-            -   name: Get release version
-                id: get_version
-                run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-            -   name: Publish package
-                run: ./gradlew -Pversion=${{ env.version }} publish
-                env:
-                    MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-                    MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                    ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
-                    ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
-            -   name: Upload JAR to GitHub Release
-                uses: softprops/action-gh-release@v2
-                with:
-                    files: build/libs/prism-${{ env.version }}.jar
-                env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  build:
+    name: Verify signed Maven package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+
+      - name: Build and sign the Maven package in a local repository
+        run: |
+          if [[ ! "$PRISM_VERSION" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a Prism version in major.minor format: $PRISM_VERSION" >&2
+            exit 1
+          fi
+
+          export GNUPGHOME
+          GNUPGHOME="$(mktemp -d)"
+          trap 'gpgconf --kill all; rm -rf "$GNUPGHOME"' EXIT
+          signing_identity='Prism build test <prism-build@example.invalid>'
+          gpg --batch --pinentry-mode loopback --passphrase '' \
+            --quick-generate-key "$signing_identity" rsa2048 sign 1d
+          export ORG_GRADLE_PROJECT_signingKey
+          ORG_GRADLE_PROJECT_signingKey="$(gpg --armor --export-secret-keys "$signing_identity")"
+          export ORG_GRADLE_PROJECT_signingPassword=''
+
+          repository="$RUNNER_TEMP/prism-maven"
+          ./gradlew "-Pversion=$PRISM_VERSION" "-PreleaseTestRepository=$repository" \
+            publishPackageProtoPublicationPublicationToReleaseTestRepository
+
+          cd "$repository/org/polypheny/prism/$PRISM_VERSION"
+          artifact="prism-$PRISM_VERSION"
+          for suffix in .pom .jar -sources.jar -javadoc.jar; do
+            file="$artifact$suffix"
+            gpg --batch --verify "$file.asc" "$file"
+            printf '%s  %s\n' "$(cat "$file.sha1")" "$file" | sha1sum --check
+            printf '%s  %s\n' "$(cat "$file.md5")" "$file" | md5sum --check
+          done
+          unzip -p "$artifact.jar" prism-api-version.properties | grep -Fx "version=$PRISM_VERSION"
+          cmp "$GITHUB_WORKSPACE/org/polypheny/prism/namespace_meta_responses.proto" \
+            <(unzip -p "$artifact.jar" org/polypheny/prism/namespace_meta_responses.proto)
+
+  publish:
+    name: Publish Maven packages and attach the JAR
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: temurin
+
+      - name: Build the release JAR
+        run: ./gradlew "-Pversion=$PRISM_VERSION" packageProto
+
+      - name: Upload JAR to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/libs/prism-${{ env.PRISM_VERSION }}.jar
+          fail_on_unmatched_files: true
+
+      - name: Publish to GitHub Packages
+        run: ./gradlew "-Pversion=$PRISM_VERSION" publishPackageProtoPublicationPublicationToGitHubPackagesRepository
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+
+      - name: Stage on Maven Central for manual publication
+        env:
+          MAVEN_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN }}
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+        run: |
+          : "${MAVEN_USERNAME:?Set the CENTRAL_USERNAME secret}"
+          : "${MAVEN_PASSWORD:?Set the CENTRAL_TOKEN secret}"
+          ./gradlew "-Pversion=$PRISM_VERSION" publishPackageProtoPublicationPublicationToCentralStagingRepository
+          authorization="$(printf '%s:%s' "$MAVEN_USERNAME" "$MAVEN_PASSWORD" | base64 -w0)"
+          echo "::add-mask::$authorization"
+          curl --fail-with-body --silent --show-error --request POST \
+            --header "Authorization: Bearer $authorization" \
+            'https://ossrh-staging-api.central.sonatype.com/manual/upload/defaultRepository/org.polypheny?publishing_type=user_managed'
