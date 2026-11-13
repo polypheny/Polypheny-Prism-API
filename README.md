@@ -40,3 +40,31 @@ and check the document metadata messages, wire compatibility, and optional-field
 python -m pip install -r requirements.txt
 python -m unittest discover -s tests -v
 ```
+
+### Publish a Prism API release
+
+The Polypheny GitHub organization stores the Maven Central credentials as shared
+Actions secrets. Under **Organization Settings → Secrets and variables → Actions**,
+check that the access policy for both secrets includes `Polypheny-Prism-API` and any
+other Polypheny repositories that use them.
+
+| Organization secret | Value from the same Sonatype user token |
+| --- | --- |
+| `CENTRAL_USERNAME` | Generated token username |
+| `CENTRAL_TOKEN` | Generated token password |
+
+Generate the pair in the [Central Publisher Portal](https://central.sonatype.com/usertoken)
+using an account with publishing access to `org.polypheny`. When rotating the token,
+update both organization secrets together and check the repositories that share them.
+
+Before publishing, check the [Maven signing secrets](.github/workflows/publish-maven-central.yml),
+the [PyPI trusted publisher](.github/workflows/publish-pypi.yml), and an unexpired
+`NUGET_API_KEY` with permission to publish a new version of `Polypheny.Prism`.
+The package build checks on pull requests and manual runs do not upload packages.
+
+Create a GitHub release targeting the verified commit on `main`, with a `major.minor`
+tag such as `2.2`. Publishing the GitHub release starts the package uploads. Check
+the runs under **Actions** and the assets on the release page. Once the Maven
+deployment is **Validated**, publish it in the
+[Central Publisher Portal](https://central.sonatype.com/publishing/deployments) and
+check that it reaches **Published**.
