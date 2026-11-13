@@ -57,9 +57,18 @@ Generate the pair in the [Central Publisher Portal](https://central.sonatype.com
 using an account with publishing access to `org.polypheny`. When rotating the token,
 update both organization secrets together and check the repositories that share them.
 
-Before publishing, check the [Maven signing secrets](.github/workflows/publish-maven-central.yml),
-the [PyPI trusted publisher](.github/workflows/publish-pypi.yml), and an unexpired
-`NUGET_API_KEY` with permission to publish a new version of `Polypheny.Prism`.
+Before publishing, check the [Maven signing secrets](.github/workflows/publish-maven-central.yml)
+and the [PyPI trusted publisher](.github/workflows/publish-pypi.yml).
+
+Configure [NuGet Trusted Publishing](https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing#github-actions-setup)
+under the NuGet owner of `Polypheny.Prism`. Use GitHub repository owner `polypheny`,
+repository `Polypheny-Prism-API`, workflow file `publish-dotnet.yml`, and environment
+`nuget`. Scope the policy to publishing new versions of `Polypheny.Prism`. In the
+repository's **Settings → Environments**, create `nuget` and set its Actions
+variable `NUGET_USER` to the personal NuGet profile name that created the policy.
+Under **Deployment branches and tags**, select **Selected branches and tags** and
+allow release tags with a tag rule such as `*.*`.
+The release job exchanges its GitHub OIDC token for a temporary NuGet API key.
 The package build checks on pull requests and manual runs do not upload packages.
 
 Create a GitHub release targeting the verified commit on `main`, with a `major.minor`
