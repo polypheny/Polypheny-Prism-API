@@ -4,28 +4,57 @@ on:
   release:
     types:
       - published
+  pull_request:
+    paths:
+      - '.github/workflows/publish-protobuf-zip.yml'
+      - 'org/polypheny/prism/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PRISM_VERSION: ${{ github.event.release.tag_name || '2.2' }}
 
 jobs:
-  package-protobuf:
-    name: Create and Upload Protobuf ZIP to GitHub Release
+  build:
+    name: Build and verify Protobuf ZIP
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      actions: write
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install zip utility
-        run: sudo apt-get install zip
-
-      - name: Package Protobuf Files
+      - name: Package and verify Protobuf files
         run: |
-          zip -r protobuf-files-${{ github.event.release.tag_name }}.zip ./org/polypheny/prism
+          if [[ ! "$PRISM_VERSION" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a Prism version in major.minor format: $PRISM_VERSION" >&2
+            exit 1
+          fi
+          archive="protobuf-files-$PRISM_VERSION.zip"
+          zip -r "$archive" ./org/polypheny/prism
+          unzip -t "$archive"
+          cmp org/polypheny/prism/namespace_meta_responses.proto \
+            <(unzip -p "$archive" org/polypheny/prism/namespace_meta_responses.proto)
+
+      - uses: actions/upload-artifact@v4
+        if: github.event_name == 'release'
+        with:
+          name: prism-protobuf-archive
+          path: protobuf-files-${{ env.PRISM_VERSION }}.zip
+          if-no-files-found: error
+
+  publish:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: prism-protobuf-archive
 
       - name: Upload ZIP to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: protobuf-files-${{ github.event.release.tag_name }}.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          files: protobuf-files-${{ env.PRISM_VERSION }}.zip
+          fail_on_unmatched_files: true

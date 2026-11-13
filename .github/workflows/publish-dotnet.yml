@@ -4,14 +4,22 @@ on:
   release:
     types:
       - published
+  pull_request:
+    paths:
+      - '.github/workflows/publish-dotnet.yml'
+      - 'Prism.csproj'
+      - 'org/polypheny/prism/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   publish-prism:
-    name: Build and publish Prism library to NuGet
+    name: Build Prism NuGet package
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      actions: write
+    env:
+      PRISM_VERSION: ${{ github.event.release.tag_name || '2.2' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -19,34 +27,44 @@ jobs:
       - name: Set up .NET environment
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0'  # Adjust if using a different version
+          dotnet-version: '10.0.x'
 
-      - name: Create Generated directory
-        run: mkdir -p Generated
-
-      - name: Restore dependencies
-        run: dotnet restore Prism.csproj
-
-      - name: Set Version
+      - name: Generate version file
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "MAJOR_VERSION=$(echo $VERSION | cut -d. -f1)" >> $GITHUB_ENV
-          echo "MINOR_VERSION=$(echo $VERSION | cut -d. -f2)" >> $GITHUB_ENV
-
-      - name: Generate Version File
-        run: |
-          echo "namespace Polypheny.Prism { public static class Version { public const string Major = \"$MAJOR_VERSION\"; public const string Minor = \"$MINOR_VERSION\"; } }" > Generated/Version.cs
-          # Assumes Generated directory is committed or added during build
+          if [[ ! "$PRISM_VERSION" =~ ^[0-9]+\.[0-9]+$ ]]; then
+            echo "Expected a Prism version in major.minor format: $PRISM_VERSION" >&2
+            exit 1
+          fi
+          IFS=. read -r major minor <<< "$PRISM_VERSION"
+          echo "PACKAGE_VERSION=$PRISM_VERSION.0" >> "$GITHUB_ENV"
+          mkdir -p Generated
+          printf 'namespace Polypheny.Prism { public static class Version { public const string Major = "%s"; public const string Minor = "%s"; } }\n' \
+            "$major" "$minor" > Generated/Version.cs
 
       - name: Build the project
-        run: dotnet build Prism.csproj --no-restore -c Release
-
-      - name: Test the project
-        run: dotnet test Prism.csproj --no-build -c Release
+        run: dotnet build Prism.csproj -c Release -p:Version="$PACKAGE_VERSION"
 
       - name: Pack the project
-        run: dotnet pack Prism.csproj --no-build -c Release --output ./nupkgs
+        run: dotnet pack Prism.csproj --no-build -c Release -p:PackageVersion="$PACKAGE_VERSION" --output ./nupkgs
+
+      - name: Verify the package version
+        run: |
+          python3 - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+          from zipfile import ZipFile
+
+          version = os.environ['PACKAGE_VERSION']
+          with ZipFile(f'nupkgs/Polypheny.Prism.{version}.nupkg') as package:
+              manifest = ET.fromstring(package.read('Polypheny.Prism.nuspec'))
+              actual = manifest.findtext('{*}metadata/{*}version')
+              if actual != version:
+                  raise SystemExit(f'Expected NuGet package version {version}, found {actual}')
+              package.getinfo('lib/net6.0/Prism.dll')
+          PY
 
       - name: Publish to NuGet
-        run: dotnet nuget push "./nupkgs/*.nupkg" --source "https://api.nuget.org/v3/index.json" --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+        if: github.event_name == 'release'
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "./nupkgs/Polypheny.Prism.$PACKAGE_VERSION.nupkg" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY" --skip-duplicate
