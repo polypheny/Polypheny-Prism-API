@@ -4,13 +4,19 @@ on:
   pull_request:
     paths:
       - '.github/workflows/publish-go.yml'
+      - 'go/**'
       - 'org/polypheny/prism/*.proto'
   workflow_dispatch:
+    inputs:
+      publish_module:
+        description: Publish the Go module tag for this revision of main
+        type: boolean
+        default: false
   release:
     types: [published]
 
 env:
-  VERSION: ${{ github.event.release.tag_name || '2.2' }}
+  RELEASE_TAG: ${{ github.event.release.tag_name }}
 
 jobs:
   build:
@@ -22,37 +28,38 @@ jobs:
 
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.18'
-          cache: false
+          go-version-file: go/go.mod
+          cache-dependency-path: go/go.sum
+
+      - name: Install pinned Go generators
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.33.0
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+          curl -fsSL https://github.com/protocolbuffers/protobuf/releases/download/v26.0/protoc-26.0-linux-x86_64.zip -o "$RUNNER_TEMP/protoc.zip"
+          unzip -q "$RUNNER_TEMP/protoc.zip" -d "$RUNNER_TEMP/protoc"
+          echo "$RUNNER_TEMP/protoc/bin" >> "$GITHUB_PATH"
+
+      - name: Verify Go module against the protocol definitions
+        run: |
+          generated="$(mktemp -d)"
+          bash go/generate.sh "$(cat go/VERSION)" "$generated"
+          # Go versions can format generated comments differently.
+          diff -ru -I '^[[:space:]]*//' go/prism "$generated/prism"
+          cd go
+          go test -mod=readonly ./...
+          go vet -mod=readonly ./...
 
       - name: Build Go archive
         run: |
-          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+$ ]]; then
-            echo "Expected a Prism version in major.minor format: $VERSION" >&2
-            exit 1
-          fi
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.33.0
-          export PATH="$(go env GOPATH)/bin:$PATH"
-          curl -fsSLO https://github.com/protocolbuffers/protobuf/releases/download/v26.0/protoc-26.0-linux-x86_64.zip
-          unzip -q protoc-26.0-linux-x86_64.zip
-
-          mkdir -p generated
-          bin/protoc -I . --go_out=generated --go_opt=paths=source_relative org/polypheny/prism/*.proto
-          IFS=. read -r major minor <<< "$VERSION"
-          cat > generated/org/polypheny/prism/version.go <<EOF
-          package prism
-
-          // MajorVersion is the major component of the API version.
-          const MajorVersion = $major
-
-          // MinorVersion is the minor component of the API version.
-          const MinorVersion = $minor
-          EOF
-          tar -C generated/org/polypheny -czf "go-api-files-${VERSION}.tar.gz" prism
+          version="${RELEASE_TAG:-$(cat go/VERSION)}"
+          generated="$(mktemp -d)"
+          bash go/generate.sh "$version" "$generated"
+          tar -C "$generated" -czf "go-api-files-${version}.tar.gz" prism
 
       - name: Compile generated Go package
         run: |
-          archive="$PWD/go-api-files-${VERSION}.tar.gz"
+          version="${RELEASE_TAG:-$(cat go/VERSION)}"
+          archive="$PWD/go-api-files-${version}.tar.gz"
           cd "$(mktemp -d)"
           tar -xzf "$archive"
           go mod init prism-package-check
@@ -63,7 +70,7 @@ jobs:
         if: github.event_name == 'release'
         with:
           name: prism-go-archive
-          path: go-api-files-${{ env.VERSION }}.tar.gz
+          path: go-api-files-*.tar.gz
           if-no-files-found: error
 
   publish:
@@ -80,5 +87,29 @@ jobs:
       - name: Attach Go archive to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: go-api-files-${{ env.VERSION }}.tar.gz
+          files: go-api-files-${{ env.RELEASE_TAG }}.tar.gz
           fail_on_unmatched_files: true
+
+  tag-module:
+    name: Publish the Go module tag
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main' && inputs.publish_module
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag the checked revision
+        run: |
+          tag="go/v$(cat go/VERSION).0"
+          remote_tag="$(git ls-remote origin "refs/tags/$tag")"
+          if [[ -n "$remote_tag" ]]; then
+            git fetch --no-tags origin "refs/tags/$tag"
+            if [[ "$(git rev-parse 'FETCH_HEAD^{commit}')" != "$GITHUB_SHA" ]]; then
+              echo "Tag $tag already points at another commit" >&2
+              exit 1
+            fi
+            echo "Tag $tag already points at $GITHUB_SHA"
+            exit 0
+          fi
+          git push origin "$GITHUB_SHA:refs/tags/$tag"

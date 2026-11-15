@@ -31,6 +31,33 @@ Generate the Python code:
 python -m grpc_tools.protoc -I . --python_out . org/polypheny/prism/*.proto
 ```
 
+### Use the Go bindings
+
+Install the Go module from your project with Go 1.23 or later.
+
+```sh
+go get github.com/polypheny/Polypheny-Prism-API/go/v2@v2.2.0
+```
+
+Import `github.com/polypheny/Polypheny-Prism-API/go/v2/prism` for the generated
+messages and the Prism protocol version. The Go module is published from the
+`go/` directory with a prefixed Git tag such as `go/v2.2.0`. The separate
+Prism release tag `2.2` provides the existing `go-api-files-2.2.tar.gz` archive.
+To publish the Go module, run **Build and publish Prism Go archive** on
+`main` with **Publish the Go module tag for this revision of main** selected.
+
+To regenerate the bindings after updating the protocol definitions, put
+protoc 26.0 and protoc-gen-go 1.33.0 on PATH and run from the repository root.
+
+```sh
+generated="$(mktemp -d)"
+bash go/generate.sh "$(cat go/VERSION)" "$generated"
+diff -ru -I '^[[:space:]]*//' go/prism "$generated/prism"
+```
+
+Replace the generated files in `go/prism/` with the updated files from
+`"$generated/prism"`. Update `go/VERSION` when the protocol version changes.
+
 ### Test protocol contracts
 
 The Python contract tests compile the checked-out definitions into a temporary directory
