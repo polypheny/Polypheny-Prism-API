@@ -16,9 +16,8 @@ package org.polypheny.prism;
 
 /*
  * The GraphFrame represents the non-relational result of a query in the labeled property graph model.
- * If the query returns a relational result, such as when aggregations are used or specific properties are returned,
- * a relational frame is used. The GraphFrame is used for results where a set of nodes and/or edges is returned.
- * The nodes or edges are wrapped in graph elements to allow them to be mixed as paths are returned as a mixed collection of both.
+ * A relational frame preserves the result's rows and columns, including columns containing graph values.
+ * A GraphFrame represents a flat sequence of nodes and edges. Path elements can be streamed in traversal order.
  * If a result produces multiple frames (used to transmit large results), all results will be of the same type (relational vs. graph).
  */
 message GraphFrame {

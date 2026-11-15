@@ -60,13 +60,13 @@ enum ProtoPolyType {
   MAP = 34;
   // Document type similar to a map but used in the document model to represent documents returned as a result.
   DOCUMENT = 35;
-  // Graph type. Returned by a query in the graph data model.
+  // A graph value containing nodes and edges.
   GRAPH = 36;
-  // Graph node type. Used inside the graph type to represent a graphs nodes.
+  // A node in a labeled property graph.
   NODE = 37;
-  // Graph edge type. Used inside the graph type to represent a graphs edges.
+  // An edge in a labeled property graph.
   EDGE = 38;
-  // Graph path type. Used in results of the graph data model to return a the result of graph queries returning a path.
+  // An ordered path through a labeled property graph.
   PATH = 39;
   // Image data type. Subtype of the file type. Same as binary but containing image data.
   IMAGE = 40;
@@ -146,6 +146,14 @@ message ProtoValue {
     ProtoDocument document = 18;
     // Field used to represent a FILE type such as FILE, IMAGE, VIDEO or AUDIO.
     ProtoFile file = 19;
+    // A node in a labeled property graph.
+    ProtoNode node = 20;
+    // An edge in a labeled property graph.
+    ProtoEdge edge = 21;
+    // An ordered path through a labeled property graph.
+    ProtoPath path = 22;
+    // A graph containing sets of nodes and edges.
+    ProtoGraph graph = 23;
   }
 }
 
@@ -322,4 +330,25 @@ message ProtoEdge {
     RIGHT_TO_LEFT = 2;
     NONE = 3;
   }
+}
+
+/*
+ * Represents one ordered path through a labeled property graph.
+ * A path has one more node than edge. Edge i connects nodes i and i+1.
+ * Both sequences follow traversal order. An edge's endpoints and direction retain
+ * their orientation in the graph, even when the traversal goes in reverse.
+ * A path can visit a node more than once.
+ */
+message ProtoPath {
+  repeated ProtoNode nodes = 1;
+  repeated ProtoEdge edges = 2;
+}
+
+/*
+ * Represents a graph, including any isolated nodes.
+ * The node and edge sequences have no ordering guarantee.
+ */
+message ProtoGraph {
+  repeated ProtoNode nodes = 1;
+  repeated ProtoEdge edges = 2;
 }
