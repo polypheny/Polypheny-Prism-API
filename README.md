@@ -34,16 +34,9 @@ python -m grpc_tools.protoc -I . --python_out . org/polypheny/prism/*.proto
 ### Test protocol contracts
 
 The Python contract tests compile the checked-out definitions into a temporary directory
-and check wire compatibility and optional-field presence.
+and check the document metadata messages, wire compatibility, and optional-field presence.
 
 ```
 python -m pip install -r requirements.txt
 python -m unittest discover -s tests -v
 ```
-
-### Structured errors (Prism 2.4)
-
-`ErrorResponse.details` can carry a SQLSTATE and a numeric error code. The numeric
-code is optional and depends on the error source. The details repeat the text in
-`ErrorResponse.message`, which is still available to readers of earlier Prism versions.
-Clients should use the legacy message when the server omits `details`.
