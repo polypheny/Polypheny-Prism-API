@@ -8,6 +8,7 @@ syntax = "proto3";
 
 import "org/polypheny/prism/connection_requests.proto";
 import "org/polypheny/prism/connection_responses.proto";
+import "org/polypheny/prism/error.proto";
 import "org/polypheny/prism/meta_requests.proto";
 import "org/polypheny/prism/meta_responses.proto";
 import "org/polypheny/prism/namespace_meta_requests.proto";
@@ -73,6 +74,8 @@ Response message sent to the client by the server in case of an error.
 message ErrorResponse {
   // Human readable error message
   string message = 1;
+  // Structured details, when provided by the server (since Prism 2.4).
+  ErrorDetails details = 2;
 }
 
 /*
