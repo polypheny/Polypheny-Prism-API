@@ -10,7 +10,7 @@ on:
     types: [published]
 
 env:
-  VERSION: ${{ github.event.release.tag_name || '2.2' }}
+  VERSION: ${{ github.event.release.tag_name || '2.5' }}
 
 jobs:
   build:

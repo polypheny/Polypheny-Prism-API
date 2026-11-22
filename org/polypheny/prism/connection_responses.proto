@@ -27,6 +27,8 @@ message ConnectionResponse {
   int32 major_api_version = 2;
   // The minor version number of the server’s API. Provides finer granularity about the server’s capabilities.
   int32 minor_api_version = 3;
+  // Indicates that this server accepts generated-key requests.
+  optional bool supports_generated_keys = 4;
 }
 
 /*

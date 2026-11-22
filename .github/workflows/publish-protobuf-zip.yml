@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 env:
-  PRISM_VERSION: ${{ github.event.release.tag_name || '2.2' }}
+  PRISM_VERSION: ${{ github.event.release.tag_name || '2.5' }}
 
 jobs:
   build:

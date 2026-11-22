@@ -19,7 +19,7 @@ jobs:
     name: Build Prism NuGet package
     runs-on: ubuntu-latest
     env:
-      PRISM_VERSION: ${{ github.event.release.tag_name || '2.2' }}
+      PRISM_VERSION: ${{ github.event.release.tag_name || '2.5' }}
 
     steps:
       - uses: actions/checkout@v4

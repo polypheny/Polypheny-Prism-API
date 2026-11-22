@@ -59,6 +59,8 @@ message ColumnMeta {
   int32 scale = 10;
   // Namespace the column resides in.
   string namespace = 11;
+  // Whether the source column generates integer values automatically. Omitted when unknown.
+  optional bool is_auto_increment = 12;
 }
 
 

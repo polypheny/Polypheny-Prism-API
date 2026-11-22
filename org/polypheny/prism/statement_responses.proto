@@ -49,6 +49,8 @@ message StatementResult {
   int64 scalar = 1;
   // (Optional) A frame of data, which could be a relational table, a graph, or a set of documents.
   optional Frame frame = 2;
+  // Complete relational frame of requested generated keys. This may accompany an update count.
+  optional Frame generated_keys = 3;
 }
 
 /*
@@ -61,6 +63,18 @@ message StatementBatchResponse {
   int32 batch_id = 1;
   // List of scalar results for each statement in the batch.
   repeated int64 scalars = 2;
+  // Requested generated keys for batch entries that produced keys, in execution order.
+  repeated BatchGeneratedKeys generated_keys = 3;
+}
+
+/*
+Generated keys returned for one execution within a batch.
+*/
+message BatchGeneratedKeys {
+  // Zero-based index of this execution in the request.
+  int32 statement_index = 1;
+  // Complete relational frame of generated keys for this execution.
+  Frame keys = 2;
 }
 
 /*
