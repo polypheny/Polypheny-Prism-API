@@ -42,6 +42,32 @@ message ExecuteUnparameterizedStatementRequest {
   If not specified, the namespace specified for the connection is used.
   */
   optional string namespace_name = 4;
+  // Return the requested generated keys separately from the statement's ordinary result.
+  optional GeneratedKeysRequest generated_keys = 5;
+}
+
+/*
+Selects the values returned for an INSERT. The column name and index variants
+project the specified columns from each inserted row.
+The selection must be set when a client requests generated keys.
+*/
+message GeneratedKeysRequest {
+  oneof selection {
+    // A true value requests identity columns from rows that generated an identity value.
+    bool all = 1;
+    ColumnNames column_names = 2;
+    ColumnIndexes column_indexes = 3;
+  }
+
+  message ColumnNames {
+    // Target column names in the requested output order.
+    repeated string names = 1;
+  }
+
+  message ColumnIndexes {
+    // One-based target column positions in the requested output order.
+    repeated int32 indexes = 1;
+  }
 }
 
 /*
@@ -70,6 +96,8 @@ message PrepareStatementRequest {
   string statement = 2;
   // (Optional) The namespace under which the statement should be prepared.
   optional string namespace_name = 3;
+  // The generated keys selection applies to each execution of this prepared statement.
+  optional GeneratedKeysRequest generated_keys = 4;
 }
 
 /*

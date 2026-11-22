@@ -13,7 +13,7 @@ if (hasProperty('version') ) {
         version = 'SNAPSHOT'
     } else {
         // Split version into major and minor components
-        def versionComponents = version.split("\\.")
+        def versionComponents = version.toString().split("-", 2)[0].split("\\.")
         majorVersion = versionComponents[0].toInteger()
         minorVersion = versionComponents[1].toInteger()
     }

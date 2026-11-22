@@ -110,6 +110,8 @@ message Column {
   bool is_hidden = 12;
   // An enumeration indicating the type of column (e.g., REGULAR, CALCULATED, VERSION).
   ColumnType column_type = 13;
+  // Whether this column generates integer values automatically. Omitted when unknown.
+  optional bool is_auto_increment = 14;
 
   /*
   The PrimaryKey message provides details about a table’s primary key.
